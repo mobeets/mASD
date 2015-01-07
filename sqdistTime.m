@@ -1,6 +1,6 @@
 function v = sqdistTime(nt, ns)
 % returns squared distance matrix with size [nt*ns, nt*ns]
-    xy = [1:nt; zeros(1,nt)]';
-    D = sqdist(xy);
-    v = repmat(D, ns, ns);
+    d = repmat(1:nt, ns, 1);
+    xy = [d(:) zeros(numel(d), 1)];
+    v = sqdist(xy);
 end

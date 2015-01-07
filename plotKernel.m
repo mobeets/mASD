@@ -1,11 +1,14 @@
-function plotKernel(xy, wf, vmax, sz, figsz)
-    if nargin < 5
+function plotKernel(xy, wf, vmax, sz, figsz, figlbl)
+    if nargin < 6
+        figlbl = '';
+    end
+    if nargin < 5 || isnan(figsz)
         figsz = 1.0;
     end
-    if nargin < 4
+    if nargin < 4 || isnan(sz)
         sz = 50;
     end
-    if nargin < 3
+    if nargin < 3 || isnan(vmax)
         vmax = max(abs(wf(:)));
     end
     mrg = 1.0;
@@ -25,7 +28,7 @@ function plotKernel(xy, wf, vmax, sz, figsz)
         subplotFormat();
         xlim([min(xy(:,1))-mrg, max(xy(:,1))+mrg]);
         ylim([min(xy(:,2))-mrg, max(xy(:,2))+mrg]);
-        title(['t=', num2str(ii)]);
+        title([figlbl, ' t=', num2str(ii)]);
     end
     
     pos = get(gcf,'Position');
