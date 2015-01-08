@@ -55,7 +55,5 @@ plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
 [evi, nll] = asd.scores(X, Y, X1, Y1, D, hyper)
 %%
 
-% problem: inv(Reg) is incredibly inaccurate
-% inv(Reg)*Reg should have total sum close to nt*ns, but it's way off...
 hyper0 = [0.80489924 11.25667696 16.75620794 0.13739696];
 asd.calcLogLikelihood(X1, Y1, D, hyper0)

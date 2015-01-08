@@ -60,13 +60,15 @@ function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog
     if isNotPosDef
         logevi = asd.logEvidenceSVD(X, Y, YY, Reg, ssq); % svd trick
     else
-        SigmaInv = reg.postCovInv(inv(Reg), XX, ssq);
+        RegInv = Reg \ eye(q);
+        SigmaInv = reg.postCovInv(RegInv, XX, ssq);
         logevi = asd.logEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q);
     end
     nlogevi = -logevi;
     if nargout > 1
         mu = reg.postMean(SigmaInv, XY, ssq);
         sse =  reg.sse(Y, X, mu);
-        nderlogevi = -asd.evidenceGradient(hyper, p, q, Ds, mu, inv(SigmaInv), Reg, sse);
+        Sigma = SigmaInv \ eye(q);
+        nderlogevi = -asd.evidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
     end
 end
