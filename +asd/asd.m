@@ -19,7 +19,7 @@ function [mu, Reg, hyper] = asd(X, Y, Ds, theta0, isLog, jac)
         isLog = true;
     end
     if nargin < 4 || isnan(theta0)
-        theta0 = [1.0, 0.15, + 2.0*ones(1,ndeltas)];
+        theta0 = [1.0, 0.15, 2.0*ones(1,ndeltas)];
     end
     
     if isLog
@@ -47,7 +47,7 @@ function [mu, Reg, hyper] = asd(X, Y, Ds, theta0, isLog, jac)
     [ro, ssq, deltas] = asd.unpackHyper(hyper);
 
     Reg = asd.prior(ro, Ds, deltas);
-    [mu, ~] = reg.meanInvCov(XX, XY, Reg, ssq);
+    [mu, ~] = tools.meanInvCov(XX, XY, Reg, ssq);
 end
 
 function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
@@ -61,13 +61,13 @@ function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog
         logevi = asd.logEvidenceSVD(X, Y, YY, Reg, ssq); % svd trick
     else
         RegInv = Reg \ eye(q);
-        SigmaInv = reg.postCovInv(RegInv, XX, ssq);
+        SigmaInv = tools.postCovInv(RegInv, XX, ssq);
         logevi = asd.logEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q);
     end
     nlogevi = -logevi;
     if nargout > 1
-        mu = reg.postMean(SigmaInv, XY, ssq);
-        sse =  reg.sse(Y, X, mu);
+        mu = tools.postMean(SigmaInv, XY, ssq);
+        sse =  tools.sse(Y, X, mu);
         Sigma = SigmaInv \ eye(q);
         nderlogevi = -asd.evidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
     end

@@ -9,7 +9,7 @@ Y10 = Y_OG(:,10);
 %% rand
 
 wf = 1 - 2*rand(nt, ns);
-plotKernel(Xxy, wf);
+plot.plotKernel(Xxy, wf);
 
 %% regression init
 
@@ -36,23 +36,19 @@ mu = XX\XY;
 b = reg.setIntercept(X_mean, Y_mean, mu, fitIntercept);
 disp(['OLS rsq = ', num2str(reg.rsq(X1*mu + b, Y1))])
 wf = reshape(mu, nt, ns);
-plotKernel(Xxy, wf, nan, nan, nan, 'OLS');
+plot.plotKernel(Xxy, wf, nan, nan, nan, 'OLS');
 
 %% ASD
 
-% make combined spatial/temporal squared distance matrix, D
-Ds = repmat(sqdist(Xxy), nt, nt);
-Dt = sqdistTime(nt, ns);
-D = nan(ns*nt, ns*nt, 2);
-D(:,:,1) = Ds;
-D(:,:,2) = Dt;
+D = tools.sqdistSpaceTime(xy, ns, nt);
 
 [mu, Reg, hyper] = asd.asd(X, Y, D, nan, true);
 b = reg.setIntercept(X_mean, Y_mean, mu, fitIntercept);
 disp(['ASD rsq = ', num2str(reg.rsq(X1*mu + b, Y1))])
 wf = reshape(mu, nt, ns);
-plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
-[evi, nll] = asd.scores(X, Y, X1, Y1, D, hyper)
+plot.plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
+[evi, nll] = asd.scores(X, Y, X1, Y1, D, hyper);
+
 %%
 
 hyper0 = [0.80489924 11.25667696 16.75620794 0.13739696];

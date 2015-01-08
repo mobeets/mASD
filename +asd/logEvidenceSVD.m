@@ -18,6 +18,6 @@ function v = logEvidenceSVD(X, Y, YY, Reg, ssq, tol)
     [p2, q2] = size(XB);
     XBXB = XB'*XB;
     XBY = XB'*Y;
-    SigmaInv = reg.postCovInv(RegInv, XBXB, ssq);
+    SigmaInv = tools.postCovInv(RegInv, XBXB, ssq);
     v = asd.logEvidence(XBXB, YY, XBY, diag(s(inds)), SigmaInv, ssq, p2, q2);
 end

@@ -1,7 +1,8 @@
 function [X0, X1, Y0, Y1] = trainAndTest(X, Y, trainPct)
-% X is size [ny, ns]
-% Y is size [ny 1]
 % returns training and testing sets for X and Y
+% 
+% X is 1d or 2d, size [ny ?]
+% Y is 1d or 2d, size [ny ?]
 % 
     ny = numel(Y);
     [trn, tst] = crossvalind('HoldOut', ones(ny, 1), 1-trainPct);
