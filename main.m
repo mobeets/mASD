@@ -17,7 +17,7 @@ trainPct = 0.8;
 fitIntercept = true;
 X = Xf; Y = Y10;
 if false
-    [X0, X1, Y0, Y1] = reg.trainAndTest(X, Y, trainPct);
+    [X0, Y0, X1, Y1] = reg.trainAndTest(X, Y, trainPct);
 else
     ind = 800;
     X0 = Xf(1:ind, :);
@@ -34,8 +34,8 @@ XX = X'*X;
 XY = X'*Y;
 mu = XX\XY;
 b = reg.setIntercept(X_mean, Y_mean, mu, fitIntercept);
-disp(['OLS rsq = ', num2str(reg.rsq(X1*mu + b, Y1))])
-wf = reshape(mu, nt, ns);
+% disp(['OLS rsq = ', num2str(reg.rsq(X1*mu + b, Y1))])
+wf = reshape(mu, ns, nt);
 plot.plotKernel(Xxy, wf, nan, nan, nan, 'OLS');
 
 %% ASD
@@ -45,7 +45,7 @@ D = tools.sqdistSpaceTime(xy, ns, nt);
 [mu, Reg, hyper] = asd.asd(X, Y, D, nan, true);
 b = reg.setIntercept(X_mean, Y_mean, mu, fitIntercept);
 disp(['ASD rsq = ', num2str(reg.rsq(X1*mu + b, Y1))])
-wf = reshape(mu, nt, ns);
+wf = reshape(mu, ns, nt);
 plot.plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
 [evi, nll] = asd.scores(X, Y, X1, Y1, D, hyper);
 

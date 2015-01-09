@@ -27,13 +27,10 @@ function [scores, hypers] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn
         y_train = Y_train{ii};
         y_test = Y_test{ii};
         for jj = 1:nhypers
-%             disp(num2str([ii, jj, nfolds, nhypers]));
             hyper0 = hypergrid(jj,:);
-%             disp('running');
             [w, b, hyper] = mapFcn(x_train, y_train, hyper0, opts);
             ws = [w; b];
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
-%             disp('scoring');
             scores(jj, ii) = scoreFcn(x_test, y_test, ws, hyper, opts);
         end
     end

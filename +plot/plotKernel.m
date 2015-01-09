@@ -28,14 +28,14 @@ function plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
     end
     mrg = 1.0;
     
-    [nt, nw] = size(wf);
+    [nw, nt] = size(wf);
     figure;
     ha = plot.tight_subplot(1, nt, [.01 .03], [.1 .01], [.01 .01]);
 
     for ii = 1:nt
         axes(ha(ii)); hold on;
         for jj = 1:nw
-            clr = clrFcn(wf(ii,jj)/vmax);
+            clr = clrFcn(wf(jj,ii)/vmax);
             plot(xy(jj,1), xy(jj,2), 'Marker', '.', 'MarkerSize', sz, 'Color', clr, 'LineStyle', 'none');
         end
         subplotFormat();

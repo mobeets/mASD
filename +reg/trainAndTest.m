@@ -1,4 +1,4 @@
-function [X0, X1, Y0, Y1] = trainAndTest(X, Y, trainPct)
+function [X0, Y0, X1, Y1] = trainAndTest(X, Y, trainPct)
 % returns training and testing sets for X and Y
 % 
 % X is 1d or 2d, size [ny ?]
