@@ -1,4 +1,5 @@
 function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog)
+% n.b. lbs and ubs are given by default in log space
     if nargin < 1 || any(isnan(lbs))
         lbs = [-3, -2, -5];
     end
@@ -12,7 +13,7 @@ function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog)
         ndeltas = 1;
     end
     if nargin < 5 || isnan(isLog)
-        isLog = true;
+        isLog = false;
     end
     assert(ndeltas >= 1);
     

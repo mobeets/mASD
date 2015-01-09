@@ -18,10 +18,14 @@ function [mu, Reg, hyper] = asd(X, Y, Ds, theta0, isLog, jac)
     if nargin < 5 || isnan(isLog)
         isLog = true;
     end
-    if nargin < 4 || isnan(theta0)
+    if nargin < 4 || any(isnan(theta0))
         theta0 = [1.0, 0.15, 2.0*ones(1,ndeltas)];
     end
-    
+    if jac
+        jacStr = 'on';
+    else
+        jacStr = 'off';
+    end
     if isLog
         theta0 = log(theta0);
         lbs = [-3, -2, -5*ones(1,ndeltas)];
@@ -36,8 +40,8 @@ function [mu, Reg, hyper] = asd(X, Y, Ds, theta0, isLog, jac)
     XX = X'*X;
 
     % minimize objfcn, with bounds lbs, ubs; starts at theta0
-    opts = optimset('display', 'iter', 'gradobj', 'off', 'largescale', 'off', ...
-        'algorithm', 'Active-Set');
+    opts = optimset('display', 'iter', 'gradobj', jacStr, ...
+        'largescale', 'off', 'algorithm', 'Active-Set');
     obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog);
     hyper = fmincon(obj, theta0, [], [], [], [], lbs, ubs, [], opts);
     if isLog
@@ -51,6 +55,7 @@ function [mu, Reg, hyper] = asd(X, Y, Ds, theta0, isLog, jac)
 end
 
 function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
+%     disp('BEGIN');
     if isLog
         hyper = exp(hyper);
     end
@@ -71,4 +76,5 @@ function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog
         Sigma = SigmaInv \ eye(q);
         nderlogevi = -asd.evidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
     end
+%     disp('END');
 end
