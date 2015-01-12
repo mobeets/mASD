@@ -1,4 +1,4 @@
-function [scores, hypers] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, nfolds, hypergrid, opts)
+function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, nfolds, hypergrid, opts)
 % solves for kernel w s.t. Y=Xw for hyperparameters in hypergrid
 %   using cross-validation
 % 
@@ -21,6 +21,7 @@ function [scores, hypers] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn
     nhyperdims = size(hypergrid, 2);
     scores = nan(nhypers, nfolds);
     hypers = nan(nhypers, nfolds, nhyperdims);
+    mus = cell(nhypers, nfolds);
     for ii = 1:nfolds
         x_train = X_train{ii};
         x_test = X_test{ii};
@@ -29,9 +30,10 @@ function [scores, hypers] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn
         for jj = 1:nhypers
             hyper0 = hypergrid(jj,:);
             [w, b, hyper] = mapFcn(x_train, y_train, hyper0, opts);
-            ws = [w; b];
+            mu = [w; b];
+            mus{jj, ii} = mu;
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
-            scores(jj, ii) = scoreFcn(x_test, y_test, ws, hyper, opts);
+            scores(jj, ii) = scoreFcn(x_test, y_test, mu, hyper, opts);
         end
     end
 end
