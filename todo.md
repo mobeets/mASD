@@ -24,3 +24,11 @@
 
 ### step 2
 * copy logevid_GLM
+
+# 2015-01-12
+
+* use C-G
+* ncc: just use bernoulli neglogli and forget the rest for now
+* no evidence -- evaluate neglogli on withheld data
+* gauss covariance function to calculate gradient, hessian, etc. - take isInv flag
+

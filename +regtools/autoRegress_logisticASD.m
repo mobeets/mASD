@@ -28,21 +28,22 @@ hypergrid = asd.makeHyperGrid(nan, nan, nan, ndeltas, false);
 if nargin < 4
     rho0 = 5;        % initial value of ridge parameter
     Lprior = speye(nw)*rho0;
-    w0 = (X'*X+Lprior)\(X'*Y);
+    w0 = (X'*X)\(X'*Y);
 end
 
 % --- set prior and log-likelihood function pointers ---
-mstruct.neglogli = @neglogli_bernoulliGLM;
-mstruct.logprior = @logprior_ASD;
+mstruct.neglogli = @regtools.neglogli_bernoulliGLM;
+mstruct.logprior = @regtools.logprior_ASD;
 mstruct.liargs = {X, Y};
 mstruct.priargs = {D};
+mstruct.hprsNoLogit = true;
 
 % --- Do grid search over ASD hyperparameters -----
-[hprsMax, wmapMax] = gridsearch_GLMevidence(w0, mstruct, hypergrid);
+[hprsMax, wmapMax] = regtools.gridsearch_GLMevidence(w0, mstruct, hypergrid);
 fprintf('best grid point: deltas = %.1f\n', hprsMax);
 
 % --- Do gradient ascent on evidence ----
-[wASD, hypers, logevid, postHess] = findEBestimate_GLM(wmapMax, hprsMax, mstruct);
+[wASD, hypers, logevid, postHess] = regtools.findEBestimate_GLM(wmapMax, hprsMax, mstruct);
 
 if nargout >2
     SDebars = sqrt(diag(inv(postHess)));
