@@ -1,4 +1,4 @@
-function [XX, XY, YY, p, q, Reg] = init(X, Y, Ds, hyper)
+function [XX, XY, YY, p, q, Reg] = gaussInit(X, Y, Ds, hyper)
     [ro, ssq, deltas] = asd.unpackHyper(hyper);
     XX = X'*X;
     XY = X'*Y;

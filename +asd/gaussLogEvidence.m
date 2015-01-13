@@ -1,4 +1,4 @@
-function v = logEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q)
+function v = gaussLogEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q)
 % 
 % XX is X.T.dot(X) - m x m
 % YY is Y.T.dot(Y) - 1 x 1

@@ -23,11 +23,15 @@ function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, m
     hypers = nan(nhypers, nfolds, nhyperdims);
     mus = cell(nhypers, nfolds);
     for ii = 1:nfolds
+        disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);
         x_train = X_train{ii};
         x_test = X_test{ii};
         y_train = Y_train{ii};
         y_test = Y_test{ii};
         for jj = 1:nhypers
+            if mod(jj, 25) == 0
+                disp(['HYPER #' num2str(jj) ' of ' num2str(nhypers)]);
+            end
             hyper0 = hypergrid(jj,:);
             [w, b, hyper] = mapFcn(x_train, y_train, hyper0, opts);
             mu = [w; b];

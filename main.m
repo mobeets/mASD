@@ -42,14 +42,14 @@ plot.plotKernel(Xxy, wf, nan, nan, nan, 'OLS');
 
 D = tools.sqdistSpaceTime(xy, ns, nt);
 
-[mu, Reg, hyper] = asd.asd(X, Y, D, nan, true);
+[mu, Reg, hyper] = asd.gaussASD(X, Y, D, nan, true);
 b = reg.setIntercept(X_mean, Y_mean, mu, fitIntercept);
 disp(['ASD rsq = ', num2str(reg.rsq(X1*mu + b, Y1))])
 wf = reshape(mu, ns, nt);
 plot.plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
-[evi, nll] = asd.scores(X, Y, X1, Y1, D, hyper);
+[evi, nll] = asd.gaussScores(X, Y, X1, Y1, D, hyper);
 
 %%
 
 hyper0 = [0.80489924 11.25667696 16.75620794 0.13739696];
-asd.calcLogLikelihood(X1, Y1, D, hyper0)
+asd.calcGaussLogLikelihood(X1, Y1, D, hyper0)

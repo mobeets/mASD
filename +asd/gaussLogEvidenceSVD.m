@@ -1,4 +1,4 @@
-function v = logEvidenceSVD(X, Y, YY, Reg, ssq, tol)
+function v = gaussLogEvidenceSVD(X, Y, YY, Reg, ssq, tol)
 %
 % calculate log-evidence in basis defined by eigenvalues of Reg > tol*S[0]
 %     where S[0] is largest eigenvalue
@@ -19,5 +19,5 @@ function v = logEvidenceSVD(X, Y, YY, Reg, ssq, tol)
     XBXB = XB'*XB;
     XBY = XB'*Y;
     SigmaInv = tools.postCovInv(RegInv, XBXB, ssq);
-    v = asd.logEvidence(XBXB, YY, XBY, diag(s(inds)), SigmaInv, ssq, p2, q2);
+    v = asd.gaussLogEvidence(XBXB, YY, XBY, diag(s(inds)), SigmaInv, ssq, p2, q2);
 end

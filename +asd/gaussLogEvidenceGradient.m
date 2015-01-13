@@ -1,4 +1,4 @@
-function [der_ro, der_ssq, der_deltas] = evidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse)
+function [der_ro, der_ssq, der_deltas] = gaussLogEvidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse)
 % 
 % gradient of log evidence w.r.t. hyperparameters
 % 

@@ -1,5 +1,6 @@
-function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog)
+function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog, isGauss)
 % n.b. lbs and ubs are given by default in log space
+% if isGauss is false, drops the ssq hyperparam
     if nargin < 1 || any(isnan(lbs))
         lbs = [-3, -2, -5];
     end
@@ -15,12 +16,20 @@ function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog)
     if nargin < 5 || isnan(isLog)
         isLog = false;
     end
+    if nargin < 6 || isnan(isGauss)
+        isGauss = true;
+    end
     assert(ndeltas >= 1);
     
     if ndeltas > 1
         lbs = [lbs(1) lbs(2) lbs(3)*ones(1, ndeltas)];
         ubs = [ubs(1) ubs(2) ubs(3)*ones(1, ndeltas)];
         ns = [ns(1) ns(2) ns(3)*ones(1, ndeltas)];
+    end
+    if ~isGauss
+        lbs = lbs([1, 3:end]);
+        ubs = ubs([1, 3:end]);
+        ns = ns([1, 3:end]);
     end
     
     hypergrid = tools.boundedCartesianProduct(lbs, ubs, ns);

@@ -1,4 +1,4 @@
-function [mu, Reg, hyper] = asd(X, Y, Ds, theta0, isLog, jac)
+function [mu, Reg, hyper] = gaussASD(X, Y, Ds, theta0, isLog, jac)
 % 
 % X - (p x q) matrix with inputs in rows
 % Y - (p, 1) matrix with measurements
@@ -63,18 +63,18 @@ function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog
     Reg = asd.prior(ro, Ds, deltas);
     [~, isNotPosDef] = chol(Reg);
     if isNotPosDef
-        logevi = asd.logEvidenceSVD(X, Y, YY, Reg, ssq); % svd trick
+        logevi = asd.gaussLogEvidenceSVD(X, Y, YY, Reg, ssq); % svd trick
     else
         RegInv = Reg \ eye(q);
         SigmaInv = tools.postCovInv(RegInv, XX, ssq);
-        logevi = asd.logEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q);
+        logevi = asd.gaussLogEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q);
     end
     nlogevi = -logevi;
     if nargout > 1
         mu = tools.postMean(SigmaInv, XY, ssq);
         sse =  tools.sse(Y, X, mu);
         Sigma = SigmaInv \ eye(q);
-        nderlogevi = -asd.evidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
+        nderlogevi = -asd.gaussLogEvidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
     end
 %     disp('END');
 end

@@ -19,9 +19,9 @@ nfolds = 10;
 [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(X, Y, nfolds);
 
 % make objective and score functions
-mapFcn = @(X_train, Y_train, hyper, opts) mapFcnASDGauss(X_train, Y_train, hyper, opts);
-minFcn = @(X_train, Y_train, hyper, opts) minFcnASDGauss(X_train, Y_train, hyper, opts);
-llFcn = @(X_test, Y_test, w, hyper, opts) asd.logLikelihood(Y_test, X_test, w(1:end-1), hyper(2));
+mapFcn = @(X_train, Y_train, hyper, opts) asd.objfcn.gaussASD_MAP(X_train, Y_train, hyper, opts);
+minFcn = @(X_train, Y_train, hyper, opts) asd.objfcn.gaussASD_minLogEvi(X_train, Y_train, hyper, opts);
+llFcn = @(X_test, Y_test, w, hyper, opts) asd.gaussLogLikelihood(Y_test, X_test, w(1:end-1), hyper(2));
 rsqFcn = @(X_test, Y_test, w, hyper, opts) reg.rsq(X_test*w(1:end-1) + w(end), Y_test);
 scoreFcn = rsqFcn;
 

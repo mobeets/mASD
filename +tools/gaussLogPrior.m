@@ -16,8 +16,8 @@ function [p, dp, negCinv] = gaussLogPrior(w, mu, C, isInv)
 %
 
 % check for included DC term
-if numel(prvec) == size(D,1) + 1
-    prvec = prvec(1:end-1);
+if numel(w) == size(C,1) + 1
+    w = w(1:end-1);
 end
 if isInv
     Cinv = C;
