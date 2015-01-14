@@ -1,4 +1,4 @@
-function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, nfolds, hypergrid, opts)
+function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, nfolds, hypergrid, map_opts, score_opts)
 % solves for kernel w s.t. Y=Xw for hyperparameters in hypergrid
 %   using cross-validation
 % 
@@ -12,7 +12,8 @@ function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, m
 %   - evaluates the test score (e.g. test likelihood) of w s.t. Y=Xw
 % nfolds [numeric] - # of folds in cross-validation
 % hypergrid [matrix] - hyperparameters to score for each fold of cv
-% opts [struct] - optional data passed to mapFcn and scoreFcn
+% map_opts [struct] - optional data passed to scoreFcn
+% score_opts [struct] - optional data passed to scoreFcn
 % 
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
@@ -33,11 +34,11 @@ function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, m
                 disp(['HYPER #' num2str(jj) ' of ' num2str(nhypers)]);
             end
             hyper0 = hypergrid(jj,:);
-            [w, b, hyper] = mapFcn(x_train, y_train, hyper0, opts);
+            [w, b, hyper] = mapFcn(x_train, y_train, hyper0, map_opts{:});
             mu = [w; b];
             mus{jj, ii} = mu;
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
-            scores(jj, ii) = scoreFcn(x_test, y_test, mu, hyper, opts);
+            scores(jj, ii) = scoreFcn(x_test, y_test, mu, hyper, score_opts{:});
         end
     end
 end

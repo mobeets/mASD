@@ -1,8 +1,8 @@
-function [der_ro, der_ssq, der_deltas] = gaussLogEvidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse)
+function [der_ro, der_ssq, der_deltas] = logEvidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse)
 % 
 % gradient of log evidence w.r.t. hyperparameters
 % 
-    [ro, ssq, deltas] = asd.unpackHyper(hyper);
+    [~, ssq, deltas] = asd.unpackHyper(hyper);
     Z = Reg / (Reg - Sigma - (mu'*mu)); % rinv
     der_ro = trace(Z)/2.0;
     

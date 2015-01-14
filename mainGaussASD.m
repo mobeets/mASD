@@ -1,36 +1,30 @@
 %% load
 
-load('data/XY.mat', 'X', 'Y', 'Xxy');
-[ny, nt, ns] = size(X);
-X_OG = permute(X, [1 3 2]);
-Y_OG = Y;
-X = reshape(X_OG, ny, nt*ns);
-Y = Y_OG(:,10);
-D = tools.sqdistSpaceTime(Xxy, ns, nt);
+[X, Y_all, R, D, Xxy, nt, ns] = loadData('data/XY.mat');
+ndeltas = size(D, 3);
+nfolds = 10;
+Y = Y_all(:,10); % choose 10th cell for analysis
 
 %% init
 
-% grid hyperparameters
-ndeltas = 2;
-hypergrid = asd.makeHyperGrid(nan, nan, nan, ndeltas, false);
-
 % create k-fold cross-validation data
-nfolds = 10;
 [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(X, Y, nfolds);
 
 % make objective and score functions
-mapFcn = @(X_train, Y_train, hyper, opts) asd.objfcn.gaussASD_MAP(X_train, Y_train, hyper, opts);
-minFcn = @(X_train, Y_train, hyper, opts) asd.objfcn.gaussASD_minLogEvi(X_train, Y_train, hyper, opts);
-llFcn = @(X_test, Y_test, w, hyper, opts) asd.gaussLogLikelihood(Y_test, X_test, w(1:end-1), hyper(2));
-rsqFcn = @(X_test, Y_test, w, hyper, opts) reg.rsq(X_test*w(1:end-1) + w(end), Y_test);
-scoreFcn = rsqFcn;
+mapFcn = @asd.gauss.fitMAP;
+minFcn = @asd.gauss.fitMinNegLogEvi;
+llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w(1:end-1), hyper(2));
+rsqFcn = @(X_test, Y_test, w, hyper) reg.rsq(X_test*w(1:end-1) + w(end), Y_test);
 
 %% search to find best hyperparameters
 
+% make hyperparameter grid
+hypergrid = asd.makeHyperGrid(nan, nan, nan, ndeltas, false);
+
 % score all hyperparameters
-opts = struct('D', D, 'fitIntercept', true);
+fcn_opts = {D};
 scores = reg.scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, ...
-    scoreFcn, nfolds, hypergrid, opts);
+    rsqFcn, nfolds, hypergrid, fcn_opts, {});
 
 % find top-performing hyperparameters over all folds
 mean_scores = mean(scores,2);
@@ -41,7 +35,7 @@ top_hypers = hypergrid(top_scores_idx,:);
 %% minimize obj starting at best hyperparameters
 
 [new_scores, new_hypers] = reg.scoreCVGrid(X_train, Y_train, X_test, ...
-    Y_test, minFcn, scoreFcn, nfolds, top_hypers, opts);
+    Y_test, minFcn, rsqFcn, nfolds, top_hypers, fcn_opts, {});
 
 new_mean_scores = mean(new_scores,2);
 [mx, idx] = max(new_mean_scores);
@@ -59,9 +53,9 @@ disp(['top mean score = ' num2str(mxa) ' at hyper = ' num2str(hyper)]);
 
 mus = cell(nfolds, 1);
 for ii = 1:nfolds
-    [mu, b, ~] = mapFcn(X_train{ii}, Y_train{ii}, hyper, opts);
+    [mu, b, ~] = mapFcn(X_train{ii}, Y_train{ii}, hyper, D);
     mus{ii} = mu;
-    sc = scoreFcn(X_test{ii}, Y_test{ii}, [mu; b], hyper, opts);
+    sc = rsqFcn(X_test{ii}, Y_test{ii}, [mu; b], hyper);
     disp(num2str([ii, sc]));
     wf = reshape(mus{ii}, ns, nt);
     plot.plotKernel(Xxy, wf, nan, nan, nan, ['ASD fold #', num2str(ii)]);
@@ -69,7 +63,26 @@ end
 
 trainPct = 0.8;
 [Xtr, Ytr, Xte, Yte] = reg.trainAndTest(X, Y, trainPct);
-[mu, b, ~] = mapFcn(Xtr, Ytr, hyper, opts);
-sc = scoreFcn(Xte, Yte, [mu; b], hyper, opts);
+[mu, b, ~] = mapFcn(Xtr, Ytr, hyper, D);
+sc = rsqFcn(Xte, Yte, [mu; b], hyper);
 wf = reshape(mu, ns, nt);
 plot.plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
+
+%% OLS
+
+mus_ML = cell(nfolds,1);
+for ii = 1:nfolds
+    Xtr = X_train{ii};
+    Xte = X_test{ii};
+    Ytr = Y_train{ii};
+    Yte = Y_test{ii};
+    [wML, b, ~] = ml.fitGaussML(Xtr, Ytr);
+    wML = [wML; b];
+    
+    rsq = rsqFcn(Xte, Yte, wML, nan);
+    scstr = sprintf('%.2f', rsq);
+    disp([num2str(ii) ' - '  scstr]);
+    
+    wf = reshape(wML(1:end-1), ns, nt);
+    plot.plotKernel(Xxy, wf, nan, nan, nan, ['OLS f', num2str(ii) ' sc=' num2str(scstr)]);
+end

@@ -1,4 +1,4 @@
-function [RegInv, B] = invPrior(C)
+function [RegInv, B, isNewBasis] = invPrior(C)
 % returns the inverse prior covariance matrix
 %   using SVD trick if necessary, returning the new basis
 % C [n x n] - prior covariance matrix
@@ -11,12 +11,14 @@ function [RegInv, B] = invPrior(C)
         s = diag(s);
         inds = s/s(1) > tol;
         % disp(['SVD removed ' num2str(sum(inds)) ' of ' num2str(numel(inds))]);
-        RegInv = diag(1/s(inds));
+        RegInv = diag(1./s(inds));
         B = U(:,inds);
+        isNewBasis = true;
     else
         % no trick
         q = eye(size(C,1));
         RegInv = C\q;
         B = q;
+        isNewBasis = false;
     end
 end

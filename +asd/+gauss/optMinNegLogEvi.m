@@ -1,4 +1,4 @@
-function [mu, Reg, hyper] = gaussASD(X, Y, Ds, theta0, isLog, jac)
+function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac)
 % 
 % X - (p x q) matrix with inputs in rows
 % Y - (p, 1) matrix with measurements
@@ -47,33 +47,27 @@ function [mu, Reg, hyper] = gaussASD(X, Y, Ds, theta0, isLog, jac)
     if isLog
         hyper = exp(hyper);
     end
-    disp(hyper);
-    [ro, ssq, deltas] = asd.unpackHyper(hyper);
-    Reg = asd.prior(ro, Ds, deltas);
-    mu = asd.calcGaussMAP(X, Y, ssq, Reg);
 end
 
 function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
-%     disp('BEGIN');
     if isLog
         hyper = exp(hyper);
     end
     [ro, ssq, deltas] = asd.unpackHyper(hyper);
     Reg = asd.prior(ro, Ds, deltas);
-    [~, isNotPosDef] = chol(Reg);
-    if isNotPosDef
-        logevi = asd.gaussLogEvidenceSVD(X, Y, YY, Reg, ssq); % svd trick
-    else
-        RegInv = Reg \ eye(q);
-        SigmaInv = tools.postCovInv(RegInv, XX, ssq);
-        logevi = asd.gaussLogEvidence(XX, YY, XY, Reg, SigmaInv, ssq, p, q);
-    end
-    nlogevi = -logevi;
+    [logEvi, sigmaInv, B, isNewBasis] = asd.gauss.logEvidence(X, Y, XX, YY, XY, Reg, ssq, p, q);
+    nlogevi = -logEvi;
     if nargout > 1
-        mu = tools.postMean(SigmaInv, XY, ssq);
+        if isNewBasis
+            XY = (X*B)'*Y;
+        end
+        mu = tools.postMean(sigmaInv, XY, ssq);
+        if isNewBasis
+            mu = B*mu;
+            sigmaInv = B*sigmaInv*B';
+        end
         sse =  tools.sse(Y, X, mu);
-        Sigma = SigmaInv \ eye(q);
-        nderlogevi = -asd.gaussLogEvidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
+        Sigma = sigmaInv \ eye(q);
+        nderlogevi = -asd.gauss.logEvidenceGradient(hyper, p, q, Ds, mu, Sigma, Reg, sse);
     end
-%     disp('END');
 end
