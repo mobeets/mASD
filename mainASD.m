@@ -34,6 +34,7 @@ scores = reg.scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, ...
 
 % find top-performing hyperparameters over all folds
 mean_scores = mean(scores,2);
+[mx0, idx0] = max(mean_scores);
 top_scores_idx = mean_scores > prctile(mean_scores, 99);
 top_hypers = hypergrid(top_scores_idx,:);
 
@@ -41,10 +42,18 @@ top_hypers = hypergrid(top_scores_idx,:);
 
 [new_scores, new_hypers] = reg.scoreCVGrid(X_train, Y_train, X_test, ...
     Y_test, minFcn, scoreFcn, nfolds, top_hypers, opts);
-[mx, idx] = max(mean(new_scores,2));
-% should I check for where new_scores doesn't beat the previous top_scores?
-hyper = new_hypers(idx, :);
-disp(['top mean score = ' num2str(mx) ' at hyper = ' num2str(hyper)]);
+
+new_mean_scores = mean(new_scores,2);
+[mx, idx] = max(new_mean_scores);
+if mx0 > mx
+    hyper = hypergrid(idx0,:);
+    mxa = mx0;
+    disp('n.b. most recent optimization was outperformed by original one.');
+else
+    hyper = top_hypers(idx,:);
+    mxa = mx;
+end
+disp(['top mean score = ' num2str(mxa) ' at hyper = ' num2str(hyper)]);
 
 %% plot
 

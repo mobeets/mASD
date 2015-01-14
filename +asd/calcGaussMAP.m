@@ -1,5 +1,6 @@
-function mu = calcGaussMAP(X, Y, Ds, hyper)
-    [ro, ssq, deltas] = asd.unpackHyper(hyper);
-    [XX, XY, YY, p, q, Reg] = asd.gaussInit(X, Y, Ds, hyper);
-    [mu, ~] = tools.meanInvCov(XX, XY, Reg, ssq);
+function mu = calcGaussMAP(X, Y, ssq, Reg)
+    [RegInv, B] = asd.invPrior(Reg);
+    XB = X*B;
+    [mu, ~] = tools.meanInvCov(XB'*XB, XB'*Y, RegInv, ssq);
+    mu = B*mu; % map back to original basis
 end

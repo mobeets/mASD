@@ -49,9 +49,8 @@ function [mu, Reg, hyper] = gaussASD(X, Y, Ds, theta0, isLog, jac)
     end
     disp(hyper);
     [ro, ssq, deltas] = asd.unpackHyper(hyper);
-
     Reg = asd.prior(ro, Ds, deltas);
-    [mu, ~] = tools.meanInvCov(XX, XY, Reg, ssq);
+    mu = asd.calcGaussMAP(X, Y, ssq, Reg);
 end
 
 function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)

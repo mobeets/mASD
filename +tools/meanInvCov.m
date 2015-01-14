@@ -1,5 +1,4 @@
-function [Mu, SigmaInv] = meanInvCov(XX, XY, Reg, ssq)
-    RegInv = Reg \ eye(size(Reg, 1));
-    SigmaInv = tools.postCovInv(RegInv, XX, ssq);
-    Mu = tools.postMean(SigmaInv, XY, ssq);
+function [mu, sigmaInv] = meanInvCov(XX, XY, RegInv, ssq)
+    sigmaInv = tools.postCovInv(RegInv, XX, ssq);
+    mu = tools.postMean(sigmaInv, XY, ssq);
 end

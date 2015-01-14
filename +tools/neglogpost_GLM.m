@@ -22,11 +22,7 @@ function [L,dL,ddL] = neglogpost_GLM(wts,hprs,mstruct)
 
 if nargout <= 1
     L = mstruct.neglogli(wts,mstruct.liargs{:});
-    p = mstruct.logprior(wts,hprs,mstruct.priargs{:});
-    if all(isinf(p))
-        disp(num2str(hprs'));
-    end
-    L = L-p;
+    L = L-mstruct.logprior(wts,hprs,mstruct.priargs{:});
 
 elseif nargout == 2
     [L,dL] = mstruct.neglogli(wts,mstruct.liargs{:});
