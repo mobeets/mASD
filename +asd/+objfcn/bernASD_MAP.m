@@ -1,4 +1,4 @@
-function [wMAP, b, hyper] = bernASD_MAP(X, Y, hyper, opts)
+function [wMAP, b, hyper, negLogPostVal] = bernASD_MAP(X, Y, hyper, opts)
 
     [X, Y, X_mean, Y_mean] = reg.centerData(X, Y, opts.fitIntercept);
     [ro, ~, deltas] = asd.unpackHyper(hyper, false);
@@ -21,7 +21,6 @@ function [wMAP, b, hyper] = bernASD_MAP(X, Y, hyper, opts)
         B = q;
         XB = X*B;
     end
-
     zer = zeros(size(XB,2),1);
 
     mstruct.neglogli = @regtools.neglogli_bernoulliGLM;
@@ -40,9 +39,10 @@ function [wMAP, b, hyper] = bernASD_MAP(X, Y, hyper, opts)
             'largescale', 'off', 'algorithm', 'Active-Set');
     % wMAP = fmincon(obj, w0, [], [], [], [], lbs, ubs, [], opts);
     wMAP = fminunc(nlogpost, w0, objopts);
+    negLogPostVal = regtools.neglogpost_GLM(wMAP, hyper, mstruct);
     wMAP = B*wMAP;
     b = reg.setIntercept(X_mean, Y_mean, wMAP, opts.fitIntercept);
-
+    
 end
 
 function [v, dv, ddv] = getLogPrior(w, hyper, zer, RegInv)

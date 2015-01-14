@@ -17,14 +17,16 @@ nfolds = 10;
 
 % make objective and score functions
 mapFcn = @(X_train, R_train, hyper, opts) asd.objfcn.bernASD_MAP(X_train, R_train, hyper, opts);
-% minFcn = @(X_train, R_train, hyper, opts) asd.objfcn.bernASD_MAP(X_train, R_train, hyper, opts);
+% minFcn = @(X_train, R_train, hyper, opts) asd.objfcn.bernASD_ME(X_train, R_train, hyper, opts);
 llFcn = @(X_test, R_test, w, hyper, opts) -regtools.neglogli_bernoulliGLM(w(1:end-1), X_test, R_test);
+% f = @(X) tools.logistic(X);
+% rsqFcn = @(X_test, R_test, w, hyper, opts) reg.rsq(f(X_test)*w(1:end-1) + w(end), R_test);
 scoreFcn = llFcn;
 
 %% search to find best hyperparameters
 
 % score all hyperparameters
-opts = struct('D', D, 'fitIntercept', true);
+opts = struct('D', D, 'fitIntercept', true, 'isLog', true);
 scores = reg.scoreCVGrid(X_train, R_train, X_test, R_test, mapFcn, ...
     scoreFcn, nfolds, hypergrid, opts);
 
@@ -33,13 +35,20 @@ mean_scores = mean(scores,2);
 top_scores_idx = mean_scores > prctile(mean_scores, 99);
 top_hypers = hypergrid(top_scores_idx,:);
 
+[mx, idx] = max(mean_scores);
+% hyper0 = [20.0855, 0.2865, 2.2026e+04];
+% hyper1 = [9.3207, 0.2563, 3.2312e+03];
+hyper0 = hypergrid(idx,:);
+
 %% minimize obj starting at best hyperparameters
 
 [new_scores, new_hypers] = reg.scoreCVGrid(X_train, R_train, X_test, ...
-    R_test, minFcn, scoreFcn, nfolds, top_hypers, opts);
+    R_test, minFcn, scoreFcn, nfolds, hyper0, opts);
 [mx, idx] = max(mean(new_scores,2));
 % should I check for where new_scores doesn't beat the previous top_scores?
-hyper = new_hypers(idx, :);
+hypers = squeeze(new_hypers(idx,:,:));
+% 
+hyper = hypers(1,:); % pick first one just for fun
 disp(['top mean score = ' num2str(mx) ' at hyper = ' num2str(hyper)]);
 
 %% plot
