@@ -13,7 +13,7 @@ Y = Y_all(:,10); % choose 10th cell for analysis
 % make objective and score functions
 mapFcn = @asd.gauss.fitMAP;
 minFcn = @asd.gauss.fitMinNegLogEvi;
-llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w(1:end-1), hyper(2));
+llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w, hyper(2));
 rsqFcn = @(X_test, Y_test, w, hyper) reg.rsq(X_test*w(1:end-1) + w(end), Y_test);
 
 %% search to find best hyperparameters
@@ -24,7 +24,7 @@ hypergrid = asd.makeHyperGrid(nan, nan, nan, ndeltas, false);
 % score all hyperparameters
 fcn_opts = {D};
 scores = reg.scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, ...
-    llFcn, nfolds, hypergrid, fcn_opts, {});
+    rsqFcn, nfolds, hypergrid, fcn_opts, {});
 
 % find top-performing hyperparameters over all folds
 mean_scores = mean(scores,2);
@@ -39,7 +39,7 @@ top_hypers = hypergrid(top_scores_idx,:);
 new_mean_scores = mean(new_scores,2);
 [mx, idx] = max(new_mean_scores);
 %%
-% mx = -inf;
+mx = -inf;
 if mx0 > mx
     hyper = hypergrid(idx0,:);
     mxa = mx0;
@@ -73,7 +73,9 @@ plot.plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
 %% fixed hyper
 
 hyper_rsq = [4.4817    2.7183    0.2865   12.1825];
-hyper_ll = [0.0498   54.5982   12.1825 22026.0];
+% hyper_ll = [0.0498   54.5982   12.1825 22026.0];
+hyper_rsq = [1.0000   54.5982    0.2865   12.1825];
+hyper_ll = [0.0498   54.5982    0.2865   12.1825];
 
 %% OLS
 
