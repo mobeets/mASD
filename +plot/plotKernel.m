@@ -1,4 +1,4 @@
-function plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
+function fig = plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
 % plots an nw-by-nt spatiotemporal kernel
 %   creates nt subplots each with nw weights
 % 
@@ -29,7 +29,7 @@ function plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
     mrg = 1.0;
     
     [nw, nt] = size(wf);
-    figure;
+    fig = figure;
     ha = plot.tight_subplot(1, nt, [.01 .03], [.1 .01], [.01 .01]);
 
     for ii = 1:nt

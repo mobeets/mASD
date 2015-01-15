@@ -1,4 +1,4 @@
-function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, nfolds, hypergrid, map_opts, score_opts)
+function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, hypergrid, map_opts, score_opts)
 % solves for kernel w s.t. Y=Xw for hyperparameters in hypergrid
 %   using cross-validation
 % 
@@ -18,6 +18,7 @@ function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, m
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
 % 
+    nfolds = numel(X_train);
     nhypers = size(hypergrid, 1);
     nhyperdims = size(hypergrid, 2);
     scores = nan(nhypers, nfolds);
@@ -30,7 +31,7 @@ function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, m
         y_train = Y_train{ii};
         y_test = Y_test{ii};
         for jj = 1:nhypers
-            if mod(jj, 25) == 0
+            if mod(jj, round(nhypers/5)) == 0
                 disp(['HYPER #' num2str(jj) ' of ' num2str(nhypers)]);
             end
             hyper0 = hypergrid(jj,:);

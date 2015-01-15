@@ -13,7 +13,8 @@ Y = Y_all(:,10); % choose 10th cell for analysis
 % make objective and score functions
 mapFcn = @asd.gauss.fitMAP;
 minFcn = @asd.gauss.fitMinNegLogEvi;
-llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w, hyper(2));
+llFcn = @(X_test, R_test, w, hyper) -tools.neglogli_poissGLM(w(1:end-1), X_test, R_test, @tools.expfun);
+% llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w, hyper(2));
 rsqFcn = @(X_test, Y_test, w, hyper) reg.rsq(X_test*w(1:end-1) + w(end), Y_test);
 
 %% search to find best hyperparameters
@@ -24,7 +25,7 @@ hypergrid = asd.makeHyperGrid(nan, nan, nan, ndeltas, false);
 % score all hyperparameters
 fcn_opts = {D};
 scores = reg.scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, ...
-    rsqFcn, nfolds, hypergrid, fcn_opts, {});
+    llFcn, nfolds, hypergrid, fcn_opts, {});
 
 % find top-performing hyperparameters over all folds
 mean_scores = mean(scores,2);
@@ -58,7 +59,7 @@ for ii = 1:nfolds
     mus{ii} = mu;
     sc = rsqFcn(X_test{ii}, Y_test{ii}, [mu; b], hyper);
     scstr = sprintf('%.2f', sc);
-    disp([num2str(ii) ' - '  scstr]);
+    disp([num2str(ii) ' = '  scstr]);
     wf = reshape(mus{ii}, ns, nt);
     plot.plotKernel(Xxy, wf, nan, nan, nan, ['ASD f', num2str(ii) ' sc=' num2str(scstr)]);
 end
@@ -90,7 +91,7 @@ for ii = 1:nfolds
     
     rsq = rsqFcn(Xte, Yte, wML, nan);
     scstr = sprintf('%.2f', rsq);
-    disp([num2str(ii) ' - '  scstr]);
+    disp([num2str(ii) ' = '  scstr]);
     
     wf = reshape(wML(1:end-1), ns, nt);
     plot.plotKernel(Xxy, wf, nan, nan, nan, ['ML f', num2str(ii) ' sc=' num2str(scstr)]);
