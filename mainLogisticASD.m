@@ -57,10 +57,11 @@ for ii = 1:nfolds
     
     nll = nllFcn(Xte, Rte, wML, nan);
     rsq = rsqFcn(Xte, Rte, wML, nan);
-    disp(num2str([ii, nll, rsq]));
+    scstr = sprintf('%.2f', rsq);
+    disp([num2str(ii) ' - '  scstr]);
     
     mus_ML{ii} = wML;
     wf = reshape(wML(1:end-1), ns, nt);
     scstr = sprintf('%.2f', rsq);
-    plot.plotKernel(Xxy, wf, nan, nan, nan, ['ASD f', num2str(ii) ' sc=' num2str(scstr)]);
+    plot.plotKernel(Xxy, wf, nan, nan, nan, ['ML f', num2str(ii) ' sc=' num2str(scstr)]);
 end

@@ -10,7 +10,8 @@ function [logEvi, sigmaInv, B, isNewBasis] = logEvidence(X, Y, XX, YY, XY, Reg, 
         XB = X*B;
         XBXB = XB'*XB;
         sigmaInv = tools.postCovInv(RegInv, XBXB, ssq);
-        logEvi = safeLogEvidence(XBXB, YY, XB'*Y, RegInv\eye(q2), sigmaInv, ssq, p, q2);
+        RegB = diag(1./diag(RegInv));
+        logEvi = safeLogEvidence(XBXB, YY, XB'*Y, RegB, sigmaInv, ssq, p, q2);
     else
         sigmaInv = tools.postCovInv(RegInv, XX, ssq);
         logEvi = safeLogEvidence(XX, YY, XY, Reg, sigmaInv, ssq, p, q);

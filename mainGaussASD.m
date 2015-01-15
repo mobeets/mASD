@@ -24,7 +24,7 @@ hypergrid = asd.makeHyperGrid(nan, nan, nan, ndeltas, false);
 % score all hyperparameters
 fcn_opts = {D};
 scores = reg.scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, ...
-    rsqFcn, nfolds, hypergrid, fcn_opts, {});
+    llFcn, nfolds, hypergrid, fcn_opts, {});
 
 % find top-performing hyperparameters over all folds
 mean_scores = mean(scores,2);
@@ -35,10 +35,11 @@ top_hypers = hypergrid(top_scores_idx,:);
 %% minimize obj starting at best hyperparameters
 
 [new_scores, new_hypers] = reg.scoreCVGrid(X_train, Y_train, X_test, ...
-    Y_test, minFcn, rsqFcn, nfolds, top_hypers, fcn_opts, {});
-
+    Y_test, minFcn, llFcn, nfolds, top_hypers, fcn_opts, {});
 new_mean_scores = mean(new_scores,2);
 [mx, idx] = max(new_mean_scores);
+%%
+mx = -inf;
 if mx0 > mx
     hyper = hypergrid(idx0,:);
     mxa = mx0;
@@ -56,9 +57,10 @@ for ii = 1:nfolds
     [mu, b, ~] = mapFcn(X_train{ii}, Y_train{ii}, hyper, D);
     mus{ii} = mu;
     sc = rsqFcn(X_test{ii}, Y_test{ii}, [mu; b], hyper);
-    disp(num2str([ii, sc]));
+    scstr = sprintf('%.2f', sc);
+    disp([num2str(ii) ' - '  scstr]);
     wf = reshape(mus{ii}, ns, nt);
-    plot.plotKernel(Xxy, wf, nan, nan, nan, ['ASD fold #', num2str(ii)]);
+    plot.plotKernel(Xxy, wf, nan, nan, nan, ['ASD f', num2str(ii) ' sc=' num2str(scstr)]);
 end
 
 trainPct = 0.8;
@@ -84,5 +86,5 @@ for ii = 1:nfolds
     disp([num2str(ii) ' - '  scstr]);
     
     wf = reshape(wML(1:end-1), ns, nt);
-    plot.plotKernel(Xxy, wf, nan, nan, nan, ['OLS f', num2str(ii) ' sc=' num2str(scstr)]);
+    plot.plotKernel(Xxy, wf, nan, nan, nan, ['ML f', num2str(ii) ' sc=' num2str(scstr)]);
 end
