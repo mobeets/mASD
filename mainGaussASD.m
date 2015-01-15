@@ -2,7 +2,7 @@
 
 [X, Y_all, R, D, Xxy, nt, ns] = loadData('data/XY.mat');
 ndeltas = size(D, 3);
-nfolds = 10;
+nfolds = 7;
 Y = Y_all(:,10); % choose 10th cell for analysis
 
 %% init
@@ -39,7 +39,7 @@ top_hypers = hypergrid(top_scores_idx,:);
 new_mean_scores = mean(new_scores,2);
 [mx, idx] = max(new_mean_scores);
 %%
-mx = -inf;
+% mx = -inf;
 if mx0 > mx
     hyper = hypergrid(idx0,:);
     mxa = mx0;
@@ -69,6 +69,11 @@ trainPct = 0.8;
 sc = rsqFcn(Xte, Yte, [mu; b], hyper);
 wf = reshape(mu, ns, nt);
 plot.plotKernel(Xxy, wf, nan, nan, nan, 'ASD');
+
+%% fixed hyper
+
+hyper_rsq = [4.4817    2.7183    0.2865   12.1825];
+hyper_ll = [0.0498   54.5982   12.1825 22026.0];
 
 %% OLS
 

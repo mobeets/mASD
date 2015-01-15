@@ -7,6 +7,9 @@ function [RegInv, B, isNewBasis] = invPrior(C)
     if isNotPosDef
         % svd trick
         tol = 1e-8;
+        if any(isnan(C(:))) || any(isinf(C(:)))
+            x=1;
+        end
         [U, s, ~] = svd(C);
         s = diag(s);
         inds = s/s(1) > tol;
@@ -14,6 +17,10 @@ function [RegInv, B, isNewBasis] = invPrior(C)
         RegInv = diag(1./s(inds));
         B = U(:,inds);
         isNewBasis = true;
+        
+        if any(diag(RegInv) == 0)
+            x=1;
+        end
     else
         % no trick
         q = eye(size(C,1));

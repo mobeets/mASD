@@ -50,7 +50,11 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac)
 end
 
 function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
+    if any(isnan(hyper))
+        x=1;
+    end
     if isLog
+        old_hyper = hyper;
         hyper = exp(hyper);
     end
     [ro, ssq, deltas] = asd.unpackHyper(hyper);

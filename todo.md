@@ -32,3 +32,15 @@
 * no evidence -- evaluate neglogli on withheld data
 * gauss covariance function to calculate gradient, hessian, etc. - take isInv flag
 
+
+
+# 2015-01-15
+
+## Question:
+
+* in gaussian loglikelihood, this includes the constant, right?
+* so in tools.neglogli_bernoulliGLM, i should also be including constant, right?
+* at least when calling it on test data, since the X and Y aren't mean-corrected
+
+## Why is SigmaInv singular so often in gaussian ASD?
+
