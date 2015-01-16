@@ -8,8 +8,8 @@ cell_names = [14 15 16 19 20 21 23 24 25 27];
 nfolds = 7;
 fold_for_plots = 1;
 
-figdir = 'figs';
-datdir = 'data';
+figdir = 'data/figs';
+datdir = 'data/fits';
 dat_fnfcn = @(tag) fullfile(datdir, [tag '.mat']);
 fig_fnfcn = @(tag, ext) fullfile(figdir, [tag '.' ext]);
 fig_svfcn = @(fig, tag, ext) hgexport(fig, fig_fnfcn(tag, ext), hgexport('factorystyle'), 'Format', ext);

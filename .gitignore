@@ -1,5 +1,6 @@
 .DS_Store
 *.m~
 *.png
-figs/
+data/figs/
+data/fits/
 _old/
