@@ -17,7 +17,7 @@ data = loadData('data/XY.mat');
 isLinReg = true;
 llstr = 'poiss';
 hypergrid = asd.makeHyperGrid(nan, nan, nan, data.ndeltas, false, isLinReg);
-M = linearASDStruct(data.D, llstr);
+M = asd.linearASDStruct(data.D, llstr);
 
 ncells = size(data.Y_all, 2);
 % ncells = 1;
@@ -34,7 +34,7 @@ end
 
 isLinReg = false;
 hypergrid = asd.makeHyperGrid(nan, nan, nan, data.ndeltas, false, isLinReg);
-M = logisticASDStruct(data.D);
+M = asd.logisticASDStruct(data.D);
 data.Y = data.R;
 [ASD, ML] = runASDandML(data, M, hypergrid, nfolds, fold_for_plots);
 
