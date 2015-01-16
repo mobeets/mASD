@@ -3,4 +3,4 @@
 *.png
 data/figs/
 data/fits/
-_old/
+data/_old/
