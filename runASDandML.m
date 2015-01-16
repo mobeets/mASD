@@ -1,4 +1,4 @@
-function [ASD, ML] = runASDandML(data, M, hypergrid, nfolds, ifold)
+function obj = runASDandML(data, M, hypergrid, foldinds, ifold)
 % 
 % fit and plot ASD and ML estimates on data, with cross-validation
 % 
@@ -22,7 +22,7 @@ function [ASD, ML] = runASDandML(data, M, hypergrid, nfolds, ifold)
 % 
 
     scFcn = M.rsqFcn;
-    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nfolds);
+    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, foldinds);
     
     fitFcn = M.mapFcn;
     fitFcnOpts = M.mapFcnOpts;
@@ -39,5 +39,9 @@ function [ASD, ML] = runASDandML(data, M, hypergrid, nfolds, ifold)
     sc = ML.scores(1);
     wf = ML.mus{1};
     ML.fig = plot.prepAndPlotKernel(data.Xxy, wf, data.ns, data.nt, 0, 'ML', sc);
+    
+    obj.ML = ML;
+    obj.ASD = ASD;
+    obj.foldinds = foldinds;
     
 end

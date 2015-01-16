@@ -1,12 +1,16 @@
-function [X_train, Y_train, X_test, Y_test] = trainAndTestKFolds(X, Y, nfolds)
+function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(X, Y, nfolds, inds)
 % returns training and testing sets for X and Y, as cell array
 %   e.g. X_train{1} returns first training set for X
 % 
 % X is 1d or 2d, size [ny ?]
 % Y is 1d or 2d, size [ny ?]
 % 
-    ny = numel(Y);
-    inds = crossvalind('Kfold', ny, nfolds);
+    if nargin < 4 || all(isnan(inds))
+        ny = numel(Y);
+        inds = crossvalind('Kfold', ny, nfolds);
+    else
+        nfolds = max(inds);
+    end
     X_train = cell(nfolds, 1);
     X_test = cell(nfolds, 1);
     Y_train = cell(nfolds, 1);
