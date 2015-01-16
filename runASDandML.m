@@ -43,6 +43,11 @@ function [ASD, ML] = runASDandML(data, M, hypergrid, nfolds, ifold)
 end
 
 function fit = cvFitAndScore(X_train, Y_train, X_test, Y_test, hypergrid, fitFcn, scFcn, fitFcnOpts, scFcnOpts)
+% 
+% for each fold, find the best weights on training data
+%   (by searching through a grid of hyperparameters)
+% then score the resulting fit on test data.
+% 
     [scores, ~, mus] = reg.scoreCVGrid(X_train, Y_train, X_test, ...
         Y_test, fitFcn, scFcn, hypergrid, fitFcnOpts, scFcnOpts);
     nfolds = size(scores,2);
@@ -59,9 +64,10 @@ function fit = cvFitAndScore(X_train, Y_train, X_test, Y_test, hypergrid, fitFcn
 end
 
 function fig = prepAndPlotKernel(Xxy, wf, ns, nt, ifold, lbl, sc)
+% plots the spatiotemporal kernel
     wf = wf(1:end-1);
     wf = reshape(wf, ns, nt);
     scstr = sprintf('%.2f', sc);
     title = [lbl ' f', num2str(ifold) ' sc=' num2str(scstr)];
-    fig = plot.plotKernel(Xxy, wf, nan, nan, nan, title);
+    fig = plot.plotKernel(Xxy, wf, nan, title);
 end

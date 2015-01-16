@@ -1,4 +1,4 @@
-function fig = plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
+function fig = plotKernel(xy, wf, vmax, figLbl, sz, figSz, clrFcn)
 % plots an nw-by-nt spatiotemporal kernel
 %   creates nt subplots each with nw weights
 % 
@@ -14,19 +14,20 @@ function fig = plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
         clrs = defaultColorScheme();
         clrFcn = colorFcn(clrs{:});
     end
-    if nargin < 6 || any(isnan(figLbl))
-        figLbl = '';
-    end
-    if nargin < 5 || isnan(figSz)
+    if nargin < 6 || isnan(figSz)
         figSz = 1.0;
     end
-    if nargin < 4 || isnan(sz)
+    if nargin < 5 || isnan(sz)
         sz = 50;
+    end
+    if nargin < 4 || any(isnan(figLbl))
+        figLbl = '';
     end
     if nargin < 3 || isnan(vmax)
         vmax = max(abs(wf(:)));
     end
     mrg = 1.0;
+    titleFontSize = 14;
     
     [nw, nt] = size(wf);
     fig = figure;
@@ -41,8 +42,13 @@ function fig = plotKernel(xy, wf, vmax, sz, figSz, figLbl, clrFcn)
         subplotFormat();
         xlim([min(xy(:,1))-mrg, max(xy(:,1))+mrg]);
         ylim([min(xy(:,2))-mrg, max(xy(:,2))+mrg]);
-        title([figLbl, ' t=', num2str(ii)]);
+        if ii == round(nt/2)
+            ht = title(figLbl);
+            set(ht, 'FontSize', titleFontSize);
+        end
+        xlabel(['t=', num2str(ii)]); % acts like a subplot title
     end
+    plot.suplabel(figLbl, 't'); 
     
     pos = get(gcf,'Position');
     pos(3:4) = figSz*[10e2 2e2];

@@ -4,7 +4,7 @@ function data = loadData(infile)
     X = permute(X, [1 3 2]);
     X = reshape(X, ny, nt*ns);
     D = asd.sqdistSpaceTime(Xxy, ns, nt);
-%     Xxy = Xxy; % todo: flip y-axis
+	Xxy(:,2) = -Xxy(:,2); % flip y-axis
     
     data.X = X;
     data.Y_all = Y;
