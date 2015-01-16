@@ -41,7 +41,7 @@ end
 %% run on decision
 
 isLinReg = false;
-hypergrid = asd.makeHyperGrid(nan, nan, nan, data.ndeltas, false, isLinReg);
+hypergrid = asd.makeHyperGrid(nan, nan, 7, data.ndeltas, false, isLinReg);
 M = asd.logisticASDStruct(data.D);
 data.Y = data.R;
 fits = runASDandML(data, M, hypergrid, foldinds, fold_for_plots);

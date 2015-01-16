@@ -1,4 +1,4 @@
-function obj = runASDandML(data, M, hypergrid, foldinds, ifold)
+function obj = runASDandML_GridSearch(data, M, lbs, ubs, ns, foldinds, ifold)
 % 
 % fit and plot ASD and ML estimates on data, with cross-validation
 % 
@@ -25,22 +25,16 @@ function obj = runASDandML(data, M, hypergrid, foldinds, ifold)
     [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, foldinds);
     
     fitFcn = M.mapFcn;
-    fitFcnOpts = M.mapFcnOpts;    
-    ASD = reg.cvFitAndScore(X_train, Y_train, ...
-        X_test, Y_test, hypergrid, fitFcn, scFcn, fitFcnOpts, {});
-    sc = ASD.scores(ifold);
+    fitFcnOpts = M.mapFcnOpts;
+    [scores, hypers, mus] = reg.scoreCVGridSearch(X_train, Y_train, X_test, ...
+        Y_test, fitFcn, scFcn, lbs, ubs, ns, fitFcnOpts, {});
+    ASD.scores = scores;
+    ASD.hyper = hypers; % this is now nfolds long
+    ASD.mus = mus;
+    sc = ASD.scores{ifold};
     wf = ASD.mus{ifold};
     ASD.fig = plot.prepAndPlotKernel(data.Xxy, wf, data.ns, data.nt, ifold, 'ASD', sc);
     
-    fitFcn = M.mlFcn;
-    fitFcnOpts = {};
-    ML = reg.cvFitAndScore(X_train, Y_train, ...
-        X_test, Y_test, [nan nan nan], fitFcn, scFcn, fitFcnOpts, {});
-    sc = ML.scores(1);
-    wf = ML.mus{1};
-    ML.fig = plot.prepAndPlotKernel(data.Xxy, wf, data.ns, data.nt, 0, 'ML', sc);
-    
-    obj.ML = ML;
     obj.ASD = ASD;
     obj.foldinds = foldinds;
     
