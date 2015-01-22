@@ -9,13 +9,6 @@ function obj = score_hypergrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcn
 %   data.ns
 %   data.nt
 % 
-% M - struct
-%   M.rsqFcn
-%   M.llFcn
-%   M.mapFcn
-%   M.mlFcn
-%   M.mapFcnOpts
-% 
 % hypergrid - grid of hyperparameters to test M.mapFcn on
 % nfolds - # of folds in cross-validation
 % ifold - fold to use for generating ASD figure

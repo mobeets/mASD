@@ -20,15 +20,12 @@ function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_t
 %   also returns matrix of hypers corresponding to scores
 % 
     nfolds = numel(X_train);
-    nhypers = numel(lbs);
     scores = cell(nfolds,1);
     hypers = cell(nfolds,1);
     mus = cell(nfolds,1);
     
     h = @(x) isLog*exp(x) + (1-isLog)*x;
-    fcnTol = 1e-7;
-    fcnTol = 1;
-    gs = @(fcn) reg.gridSearch(lbs, ubs, ns, 1e-5*ones(1,nhypers), fcnTol, 1e4, fcn);
+    gs = @(fcn) reg.gridSearch(fcn, lbs, ubs, ns);
     
     for ii = 1:nfolds
         disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);

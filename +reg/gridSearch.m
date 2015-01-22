@@ -1,46 +1,57 @@
-function [XBest,BestF,Iters] = gridSearch(XLo, XHi, NumDiv, MinDeltaX, Eps_Fx, MaxIter, myFx)
+function [XBest, BestF, niters] = gridSearch(fcn, lbs, ubs, ns, minDeltaX, tol, maxiter)
 % Function performs multivariate optimization using the
 % grid search.
 %
 % Input
 %
-% XLo - array of lower values
-% XHi - array of higher values
-% NumDiv - array of number of divisions along each dimension
-% MinDeltaX - array of minimum search values for each variable
-% Eps_Fx - tolerance for difference in successive function values
-% MaxIter - maximum number of iterations
-% myFx - name of the optimized function
+% fcn - name of the optimized function
+% lbs - array of lower values
+% ubs - array of higher values
+% ns - array of number of divisions along each dimension
+% minDeltaX - array of minimum search values for each variable
+% tol - tolerance for difference in successive function values
+% maxiter - maximum number of iterations
 %
 % Output
 %
 % XBest - array of optimized variables
 % BestF - function value at optimum
-% Iters - number of iterations
+% niters - number of iterations
 %
-N = numel(XLo);
-Xcenter = (XHi + XLo) / 2;
+
+if nargin < 7
+    maxiter = 1e4;
+end
+if nargin < 6
+    tol = 1e-7;
+end
+if nargin < 5
+    minDeltaX = 1e-5*ones(1, numel(lbs));
+end
+
+N = numel(lbs);
+Xcenter = (ubs + lbs) / 2;
 XBest = Xcenter;
-DeltaX = (XHi - XLo) ./ NumDiv;
-BestF = feval(myFx, XBest);
+DeltaX = (ubs - lbs) ./ ns;
+BestF = feval(fcn, XBest);
 if BestF >= 0
   LastBestF = BestF + 100;
 else
   LastBestF = 100 - BestF;
 end
-X = XLo; % initial search value
 
-Iters = 0;
-
-while any(DeltaX > MinDeltaX) && (abs(BestF - LastBestF) > Eps_Fx) && (Iters <= MaxIter)
+niters = 0;
+nzooms = 0;
+X = lbs; % initial search value
+while any(DeltaX > minDeltaX) && (abs(BestF - LastBestF) > tol) && (niters <= maxiter)
 
   bGoOn2 = 1;
 
   while bGoOn2 > 0
 
-    Iters = Iters + 1;
+    niters = niters + 1;
 
-    F = feval(myFx, X);
+    F = feval(fcn, X);
     if F < BestF
       LastBestF = BestF;
       BestF = F;
@@ -48,9 +59,9 @@ while any(DeltaX > MinDeltaX) && (abs(BestF - LastBestF) > Eps_Fx) && (Iters <= 
     end
 
     for ii = 1:N
-      if X(ii) >= XHi(ii)
+      if X(ii) >= ubs(ii)
         if ii < N
-          X(ii) = XLo(ii);
+          X(ii) = lbs(ii);
         else
           bGoOn2 = 0;
           break
@@ -64,8 +75,10 @@ while any(DeltaX > MinDeltaX) && (abs(BestF - LastBestF) > Eps_Fx) && (Iters <= 
   end
 
   XCenter = XBest;
-  DeltaX = DeltaX ./ NumDiv;
-  XLo = XCenter - DeltaX .* NumDiv / 2;
-  XHi = XCenter + DeltaX .* NumDiv / 2;
-  X = XLo; % set initial X
+  DeltaX = DeltaX ./ ns;
+  lbs = XCenter - DeltaX .* ns / 2;
+  ubs = XCenter + DeltaX .* ns / 2;
+  X = lbs; % set initial X
+  nzooms = nzooms + 1;
 end
+nzooms
