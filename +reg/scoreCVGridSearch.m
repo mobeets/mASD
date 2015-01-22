@@ -1,4 +1,4 @@
-function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, lbs, ubs, ns, map_opts, score_opts)
+function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, lbs, ubs, ns, map_opts, score_opts, isLog)
 % solves for kernel w s.t. Y=Xw for hyperparameters using cross-validation
 % 
 % X_train, X_test [cells] - training and testing stimuli
@@ -14,6 +14,7 @@ function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_t
 % 
 % map_opts [struct] - optional data passed to scoreFcn
 % score_opts [struct] - optional data passed to scoreFcn
+% isLog [logical] - lbs, ubs are given in logspace, so use exp(hyper)
 % 
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
@@ -24,7 +25,10 @@ function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_t
     hypers = cell(nfolds,1);
     mus = cell(nfolds,1);
     
-    gs = @(fcn) reg.gridSearch(lbs, ubs, ns, 1e-5*ones(1,nhypers), 1e-7, 1e4, fcn);
+    h = @(x) isLog*exp(x) + (1-isLog)*x;
+    fcnTol = 1e-7;
+    fcnTol = 1;
+    gs = @(fcn) reg.gridSearch(lbs, ubs, ns, 1e-5*ones(1,nhypers), fcnTol, 1e4, fcn);
     
     for ii = 1:nfolds
         disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);
@@ -34,14 +38,15 @@ function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_t
         y_test = Y_test{ii};
         
         g = @(hyper) mapFcnHandle(mapFcn, x_train, y_train, hyper, map_opts);
-        f = @(hyper) -scoreFcn(x_test, y_test, g(hyper), hyper, score_opts{:});
+        f = @(hyper) -scoreFcn(x_test, y_test, g(h(hyper)), h(hyper), score_opts{:});
         [mxHyper, mxScore] = gs(f);
+        mxHyper = h(mxHyper); % map back to non-log space, if necessary
         
         [w, b, mxHyper] = mapFcn(x_train, y_train, mxHyper, map_opts{:});
         mu = [w; b];
         mus{ii} = mu;
         hypers{ii} = mxHyper;
-        scores{ii} = mxScore;
+        scores{ii} = -mxScore; % scores are negative, so reverse this
     end
 end
 

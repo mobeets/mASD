@@ -8,7 +8,7 @@ function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog, isLinReg)
         ubs = [3, 10, 10];
     end
     if nargin < 3 || any(isnan(ns)) || numel(ns) == 1
-        if numel(ns) == 1
+        if numel(ns) == 1 && ~isnan(ns)
             val = ns;
         else
             val = 5;

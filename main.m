@@ -19,7 +19,7 @@ fig_svfcn = @(fig, tag, ext) hgexport(fig, fig_fnfcn(tag, ext), hgexport('factor
 
 isLinReg = true;
 llstr = 'gauss';
-hypergrid = asd.makeHyperGrid(nan, nan, nan, data.ndeltas, false, isLinReg);
+hypergrid = asd.makeHyperGrid(nan, nan, 3, data.ndeltas, false, isLinReg);
 M = asd.linearASDStruct(data.D, llstr);
 
 % cell_inds = 2;
@@ -29,8 +29,11 @@ ncells = numel(cell_inds);
 for nn = 1:ncells
     cell_ind = cell_inds(nn);
     data.Y = data.Y_all(:,cell_ind); % choose cell for analysis
-    fits = runASDandML(data, M, hypergrid, foldinds, fold_for_plots);
-    fits.ASD.llstr = llstr;
+%     fits = reg.runASDandML_grid(data, M, hypergrid, foldinds, fold_for_plots);
+    fits.ASD = reg.scoreHypergrid(data, hypergrid, M.mapFcn, M.mapFcnOpts, ...
+        M.rsqFcn, {}, foldinds, ['ASD-' llstr], fold_for_plots);
+    fits.ML = reg.scoreHypergrid(data, hypergrid, M.mlFcn, {}, ...
+        M.rsqFcn, {}, foldinds, 'ML', 1);
     fits.isLinReg = isLinReg;
     lbl = ['cell_' num2str(cell_ind)];
     updateStruct(dat_fnfcn(lbl), fits);
@@ -44,9 +47,25 @@ isLinReg = false;
 hypergrid = asd.makeHyperGrid(nan, nan, 7, data.ndeltas, false, isLinReg);
 M = asd.logisticASDStruct(data.D);
 data.Y = data.R;
-fits = runASDandML(data, M, hypergrid, foldinds, fold_for_plots);
+fits.ASD = reg.scoreHypergrid(data, hypergrid, M.mapFcn, M.mapFcnOpts, ...
+    M.rsqFcn, {}, foldinds, 'ASD', fold_for_plots);
+fits.ML = reg.scoreHypergrid(data, hypergrid, M.mlFcn, {}, ...
+    M.rsqFcn, {}, foldinds, 'ML', 1);
 fits.isLinReg = isLinReg;
 
 updateStruct(dat_fnfcn('decision'), fits);
 fig_svfcn(fits.ASD.fig, 'decision-ASD', 'png');
 fig_svfcn(fits.ML.fig, 'decision-ML', 'png');
+
+%% run on decision -- grid search
+
+isLinReg = false;
+M = asd.logisticASDStruct(data.D);
+data.Y = data.R;
+lbs = [-3, -2, -5]; ubs = [3, 10, 10]; ns = [3, 3, 3]; isLog = true;
+fits.ASD = reg.scoreGridSearch(data, lbs, ubs, ns, M.mapFcn, ...
+    M.mapFcnOpts, M.rsqFcn, {}, foldinds, fold_for_plots, 'ASD', isLog);
+fits.isLinReg = isLinReg;
+
+updateStruct(dat_fnfcn('decision_srch'), fits);
+fig_svfcn(fits.ASD.fig, 'decision_srch-ASD', 'png');
