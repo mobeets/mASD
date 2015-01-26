@@ -46,15 +46,26 @@ function newObj = makeUpdatedObj(oldObj, obj)
 %   where objs similar to obj are stored in a cell array of oldObj
 % 
     fieldnms = fieldnames(oldObj);
+    
+    % find max index to use
+    nobjs0 = nan(numel(fieldnms));
     for ii = 1:numel(fieldnms)
         fldnm = fieldnms{ii};
-        nobjs = numel(oldObj.(fldnm));
+        nobjs0(ii) = numel(oldObj.(fldnm));
+    end
+    nobjs = max(nobjs0);
+    
+    for ii = 1:numel(fieldnms)
+        fldnm = fieldnms{ii};
         newObj.(fldnm) = cell(nobjs+1,1); % increase size by one
-        for jj = 1:nobjs
+        curnobjs = numel(oldObj.(fldnm));
+        for jj = 1:curnobjs
             newObj.(fldnm){jj} = oldObj.(fldnm){jj};
         end
         newObj.(fldnm){nobjs+1} = obj.(fldnm);
+        
     end
+    
     % add fields of obj that aren't already in oldObj
     fieldnms = fieldnames(obj);
     for ii = 1:numel(fieldnms)

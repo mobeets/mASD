@@ -1,4 +1,4 @@
-function obj = score_hypergrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, lbl, ifold)
+function obj = scoreHypergrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, lbl, ifold)
 % 
 % fit and plot estimates on data, with cross-validation
 % 

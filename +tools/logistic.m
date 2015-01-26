@@ -9,5 +9,7 @@ function p = logistic(x)
 
 p = exp(x)./(1+exp(x));
 
+p(isnan(p)) = 1;
 p(x > 1e3) = 1;
+
 p(isinf(x) & x < 0) = 0;
