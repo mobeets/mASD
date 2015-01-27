@@ -19,32 +19,31 @@ The Gaussian likelihood has a closed-form solution while the others do not.
 
 ### Example
 
-Load some data: X (stimulus), Y (response), Xxy (spatial locations of X's columns), ns, nt (space and time filter sizes)
+Load some data: X (stimulus), Y (response), D (squared distance matrix).
 
 ```
-[X, Y, D, Xxy, ns, nt] = loadData('data/XY.mat'); % write your own
+[X, Y, D] = loadData('data/XY.mat'); % write your own
 ```
 
-Initialize data, hypergrid, and functions for ASD logistic regression
+Initialize hypergrid (with default bounds) and functions for ASD and ML logistic regression.
 
 
 ```
-hypergrid = asd.makeHyperGrid(nan, nan, nan, data.ndeltas, false, false);
+hypergrid = asd.makeHyperGrid(nan, nan, nan, 2, false, false);
 M = asd.logisticASDStruct(D);
-fitFcn = M.mapFcn;
-fitOpts = M.mapFcnOpts;
-scFcn = M.rsqFcn;
-scFcnOpts = {};
+mlFcn = @(~) ml.fitopts('bern');
 ```
 
-Fit on 10-fold cross-validation
+Fit on 10-fold cross-validation.
 
 ```
-[X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(X, Y, 10);
-ASD = reg.cvFitAndScore(X_train, Y_train, X_test, Y_test, hypergrid, fitFcn, scFcn, fitOpts, scFcnOpts);
+nfolds = 10;
+[Xtr, Ytr, Xte, Yte] = reg.trainAndTestKFolds(X, Y, nfolds);
+ASD = reg.cvFitAndScore(Xtr, Ytr, Xte, Yte, hypergrid, M.mapFcn, M.rsqFcn,  M.mapFcnOpts, {});
+ML = reg.cvFitAndScore(Xtr, Ytr, Xte, Yte, [nan nan nan], mlFcn, M.rsqFcn,  {}, {});
 ```
 
-Plot kernel
+Plot kernel given Xxy (spatial locations of X's columns), ns, nt (space and time filter sizes).
 
 ```
 rsq = ASD.scores(1);
