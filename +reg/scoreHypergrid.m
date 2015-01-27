@@ -1,4 +1,4 @@
-function obj = scoreHypergrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, lbl, ifold)
+function [obj, wf, sc] = scoreHypergrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, lbl, ifold)
 % 
 % fit and plot estimates on data, with cross-validation
 % 
@@ -18,7 +18,6 @@ function obj = scoreHypergrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnO
     obj = reg.cvFitAndScore(X_train, Y_train, ...
         X_test, Y_test, hypergrid, fitFcn, scFcn, fitFcnOpts, scFcnOpts);
     sc = obj.scores(ifold); wf = obj.mus{ifold};
-    obj.fig = plot.prepAndPlotKernel(data.Xxy, wf, data.ns, data.nt, ifold, lbl, sc);
     obj.foldinds = foldinds;
     obj.label = lbl; 
 end
