@@ -39,7 +39,8 @@ function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_t
         [mxHyper, mxScore] = gs(f);
         mxHyper = h(mxHyper); % map back to non-log space, if necessary
         
-        [w, b, mxHyper] = mapFcn(x_train, y_train, mxHyper, map_opts{:});
+%         [w, b, mxHyper] = mapFcn(x_train, y_train, mxHyper, map_opts{:});
+        [w, b, mxHyper] = reg.fitHypersAndWeights(x_train, y_train, mapFcn(mxHyper, map_opts{:}));
         mu = [w; b];
         mus{ii} = mu;
         hypers{ii} = mxHyper;
@@ -48,7 +49,8 @@ function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_t
 end
 
 function mu = mapFcnHandle(mapFcn, x_train, y_train, hyper0, map_opts)
-    [w, b, mxHyper] = mapFcn(x_train, y_train, hyper0, map_opts{:});
+    [w, b, mxHyper] = reg.fitHypersAndWeights(x_train, y_train, mapFcn(hyper0, map_opts{:}));
+%     [w, b, mxHyper] = mapFcn(x_train, y_train, hyper0, map_opts{:});
     mu = [w; b];
 %     f = @(hyper) -scoreFcn(x_test, y_test, mu, myHyper, score_opts{:});
 end

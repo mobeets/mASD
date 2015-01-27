@@ -19,22 +19,29 @@ The Gaussian likelihood has a closed-form solution while the others do not.
 
 ### Example
 
-Initialize data, hypergrid, and functions for ASD logistic regression
+Load some data: X (stimulus), Y (response), Xxy (spatial locations of X's columns), ns, nt (space and time filter sizes)
 
 ```
-data = loadData('data/XY.mat');
+[X, Y, D, Xxy, ns, nt] = loadData('data/XY.mat'); % write your own
+```
+
+Initialize data, hypergrid, and functions for ASD logistic regression
+
+
+```
 hypergrid = asd.makeHyperGrid(nan, nan, nan, data.ndeltas, false, false);
-M = asd.logisticASDStruct(data.D);
+M = asd.logisticASDStruct(D);
 fitFcn = M.mapFcn;
-scFcn = M.rsqFcn;
 fitOpts = M.mapFcnOpts;
+scFcn = M.rsqFcn;
+scFcnOpts = {};
 ```
 
 Fit on 10-fold cross-validation
 
 ```
-[X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.R, 10);
-ASD = reg.cvFitAndScore(X_train, Y_train, X_test, Y_test, hypergrid, fitFcn, scFcn, fitOpts, {});
+[X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(X, Y, 10);
+ASD = reg.cvFitAndScore(X_train, Y_train, X_test, Y_test, hypergrid, fitFcn, scFcn, fitOpts, scFcnOpts);
 ```
 
 Plot kernel
@@ -42,5 +49,5 @@ Plot kernel
 ```
 rsq = ASD.scores(1);
 wf = ASD.mus{1};
-plot.prepAndPlotKernel(data.Xxy, wf, data.ns, data.nt, 1, 'ASD', rsq);
+plot.prepAndPlotKernel(Xxy, wf, ns, nt, 1, 'ASD', rsq);
 ```
