@@ -35,7 +35,8 @@ function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, m
                 disp(['HYPER #' num2str(jj) ' of ' num2str(nhypers)]);
             end
             hyper0 = hypergrid(jj,:);
-            [w, b, hyper] = mapFcn(x_train, y_train, hyper0, map_opts{:});
+            [w, b, hyper] = reg.fitHypersAndWeights(x_train, y_train, mapFcn(hyper0, map_opts{:}));
+%             [w, b, hyper] = mapFcn(x_train, y_train, hyper0, map_opts{:});
             mu = [w; b];
             mus{jj, ii} = mu;
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
