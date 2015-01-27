@@ -1,4 +1,4 @@
-function [wMAP, b, hyper] = bernASD_ME(X, Y, hyper0, opts)
+function [wMAP, b, hyper] = fitMinNegLogEvi(X, Y, hyper0, opts)
 
     LOWER_BOUND_DELTA_TEMPORAL = 0.12;
     ndeltas = size(opts.D, 3);
