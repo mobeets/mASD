@@ -56,7 +56,8 @@ plot.prepAndPlotKernel(Xxy, wf, ns, nt, 1, 'ASD', rsq);
 Running tests:
 
 ```
->> runtests('tests/allTests.m')
+>> runtests('tests/testLinear.m')
+>> runtests('tests/testLogistic.m')
 ```
 
 Updating tests:
