@@ -1,4 +1,28 @@
-function testFit(data, M, mlFcn, isLinReg)
+function tests = allTests
+    tests = functiontests(localfunctions);
+end
+
+function setup(testCase)
+    cd('..');
+end
+
+function testLinear(testCase)
+    data = load('tests/testDataLinear.mat');
+    M = asd.linearASDStruct(data.D);
+    mlFcn = @(~) ml.fitopts('gauss');
+    isLinReg = true;
+    runFits(data, M, mlFcn, isLinReg);
+end
+
+function testLogistic(testCase)
+    data = load('tests/testDataLogistic.mat');
+    M = asd.logisticASDStruct(data.D);
+    mlFcn = @(~) ml.fitopts('bern');
+    isLinReg = false;
+    runFits(data, M, mlFcn, isLinReg);
+end
+
+function runFits(data, M, mlFcn, isLinReg)
 
     % test distance matrix construction
     D = asd.sqdist.spaceTime(data.Xxy, data.ns, data.nt);
@@ -45,4 +69,3 @@ function testFit(data, M, mlFcn, isLinReg)
     assert(all(hyprs(:) == hyprs1(:)));
     assert(all(mus(:) == mus1(:)));
 end
-    

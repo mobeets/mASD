@@ -50,3 +50,19 @@ rsq = ASD.scores(1);
 wf = ASD.mus{1};
 plot.prepAndPlotKernel(Xxy, wf, ns, nt, 1, 'ASD', rsq);
 ```
+
+## Testing framework
+
+Running tests:
+
+```
+>> runtests('tests/allTests.m')
+```
+
+Updating tests:
+
+```
+>> cd tests
+>> updateDataLinear
+>> updateDataLogistic
+```

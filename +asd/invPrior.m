@@ -4,6 +4,7 @@ function [RegInv, B, isNewBasis] = invPrior(C)
 % C [n x n] - prior covariance matrix
 % 
     [~, isNotPosDef] = chol(C);
+    isNotPosDef = rcond(C) < 1e-12;
     if isNotPosDef
         % svd trick
         tol = 1e-8;
