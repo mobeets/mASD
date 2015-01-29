@@ -1,6 +1,12 @@
 function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog, isLinReg)
-% n.b. lbs and ubs are given by default in log space
-% if isGauss is false, drops the ssq hyperparam
+% hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog, isLinReg)
+% 
+% lbs, ubs - vectors of lower and upper bounds, in log space
+% ns - vector of the number of bins between each bound in lbs and ubs
+% ndeltas - # of smoothing hyperparameters
+% isLog - if false, maps the final grid back into linear (non-log) space
+% isLinReg - if true, ignores the second entry in lbs and ubs
+% 
     if nargin < 1 || any(isnan(lbs))
         lbs = [-3, -2, -5];
     end
@@ -37,7 +43,7 @@ function hypergrid = makeHyperGrid(lbs, ubs, ns, ndeltas, isLog, isLinReg)
         ns = ns([1, 3:end]);
     end
     
-    hypergrid = tools.boundedCartesianProduct(lbs, ubs, ns);
+    hypergrid = tools.gridCartesianProduct(lbs, ubs, ns);
 
     if ~isLog
         hypergrid = exp(hypergrid);

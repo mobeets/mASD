@@ -1,9 +1,9 @@
 function v = prior(ro, Ds, deltas)
+% v = prior(ro, Ds, deltas)
 % 
 % ro - float
-% Ds, deltas - vectors of:
-%     D - (q x q) squared distance matrix in some stimulus dimension
-%     delta - float, the weighting of D
+% Ds - (q x q x nd) - squared distance matrix in some stimulus dimension
+% deltas - (nd x 1) - float, the weighting of D
 % 
     vs = 0.0;
     for ii = 1:numel(deltas)

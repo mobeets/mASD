@@ -1,4 +1,4 @@
-function grid = boundedCartesianProduct(lbs, ubs, ns, fs)
+function grid = gridCartesianProduct(lbs, ubs, ns, fs)
 % generates a cartesian product for variables
 %   where each variable's range of values is given by f(lb, ub, n)
 % 

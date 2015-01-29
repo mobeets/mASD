@@ -1,9 +1,10 @@
 function [RegInv, B, isNewBasis] = invPrior(C)
-% returns the inverse prior covariance matrix
-%   using SVD trick if necessary, returning the new basis
+% [RegInv, B, isNewBasis] = invPrior(C)
+% 
+% returns the ASD inverse prior covariance matrix
+%   using SVD trick if necessary, returning the new basis (B)
 % C [n x n] - prior covariance matrix
 % 
-    [~, isNotPosDef] = chol(C);
     isNotPosDef = rcond(C) < 1e-12;
     if isNotPosDef
         % svd trick
