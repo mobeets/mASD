@@ -25,7 +25,6 @@ function [scores, hypers, mus] = cvScoreGridSearch(X_train, Y_train, X_test, Y_t
     mus = cell(nfolds,1);
     
     h = @(x) isLog*exp(x) + (1-isLog)*x;
-    gs = @(fcn) reg.gridSearch(fcn, lbs, ubs, ns);
     
     for ii = 1:nfolds
         disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);
@@ -34,20 +33,18 @@ function [scores, hypers, mus] = cvScoreGridSearch(X_train, Y_train, X_test, Y_t
         y_train = Y_train{ii};
         y_test = Y_test{ii};
         
-        g = @(hyper) mapFcnHandle(mapFcn, x_train, y_train, hyper, map_opts);
-        f = @(hyper) -scoreFcn(x_test, y_test, g(h(hyper)), h(hyper), score_opts{:});
-        [mxHyper, mxScore] = gs(f);
-        mxHyper = h(mxHyper); % map back to non-log space, if necessary
+        wts = @(hyper) mapFcnHandle(mapFcn, x_train, y_train, hyper, map_opts);
+        score = @(hyper) -scoreFcn(x_test, y_test, wts(h(hyper)), h(hyper), score_opts{:});
+        [mxHyper, mxScore] = reg.gridSearch(score, lbs, ubs, ns);
         
-        [w, b, mxHyper] = reg.fitHypersAndWeights(x_train, y_train, mapFcn(mxHyper, map_opts{:}));
-        mu = [w; b];
-        mus{ii} = mu;
+        mxHyper = h(mxHyper); % map back to non-log space, if necessary
+        mus{ii} = wts(mxHyper);
         hypers{ii} = mxHyper;
         scores{ii} = -mxScore; % scores are negative, so reverse this
     end
 end
 
-function mu = mapFcnHandle(mapFcn, x_train, y_train, hyper0, map_opts)
-    [w, b, ~] = reg.fitHypersAndWeights(x_train, y_train, mapFcn(hyper0, map_opts{:}));
+function mu = mapFcnHandle(mapFcn, x, y, hyper0, map_opts)
+    [w, b, ~] = reg.fitHypersAndWeights(x, y, mapFcn(hyper0, map_opts{:}));
     mu = [w; b];
 end

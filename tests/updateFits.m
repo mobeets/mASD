@@ -1,53 +1,26 @@
-function updateFit(fname, data, M, mlFcn, isLinReg)
+function updateFits(fname, data, M, mlFcn, isLinReg)
     % verify erasing of previous results
     if ~checkContinue()
         return;
     end
-    cd ..
     
-    % test distance matrix construction
-    D = asd.sqdist.spaceTime(data.Xxy, data.ns, data.nt);
+    [D, hypergrid, ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg);
+    
     data.D = D;
-
-    isLog = true;
-    if isLinReg
-        lbs = [-3 -2 -5 -5];
-        ubs = [3 10 10 10];
-        ns = 5*ones(1,4);
-    else
-        lbs = [-3 -5 -5];
-        ubs = [3 10 10];
-        ns = 5*ones(1,3);
-    end
-
-    % test hypergrid
-    hypergrid = exp(tools.gridCartesianProduct(lbs, ubs, ns));
     data.hypergrid = hypergrid;
 
-    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, data.foldinds);
+    data.ASD.scores = ASD.scores;
+    data.ASD.hyprs = ASD.hyprs;
+    data.ASD.mus = ASD.mus;
 
-    % test ASD
-    [scores, hyprs, mus] = reg.cvScoreGrid(X_train, Y_train, X_test, ...
-        Y_test, M.mapFcn, M.rsqFcn, hypergrid, {}, {});
-    data.ASD.scores = scores;
-    data.ASD.hyprs = hyprs;
-    data.ASD.mus = mus;
+    data.ML.scores = ML.scores;
+    data.ML.mus = ML.mus;
 
-    % test ML
-    [scores, ~, mus] = reg.cvScoreGrid(X_train, Y_train, X_test, ...
-        Y_test, mlFcn, M.rsqFcn, [nan nan nan], {}, {});
-    data.ML.scores = scores;
-    data.ML.mus = mus;
-
-    % test ASD grid search
-    [scores, hyprs, mus] = reg.cvScoreGridSearch(X_train, Y_train, X_test, ...
-        Y_test, M.mapFcn, M.rsqFcn, lbs, ubs, ns, {}, {}, isLog);
-    data.ASD_gs.scores = scores;
-    data.ASD_gs.hyprs = hyprs;
-    data.ASD_gs.mus = mus;
+    data.ASD_gs.scores = ASD_gs.scores;
+    data.ASD_gs.hyprs = ASD_gs.hyprs;
+    data.ASD_gs.mus = ASD_gs.mus;
     
     save(fname, '-struct', 'data');
-    cd tests
 end
 
 function cont = checkContinue()

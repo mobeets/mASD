@@ -1,8 +1,7 @@
-function [ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg)
+function [D, hypergrid, ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg)
 
     % test distance matrix construction
     D = asd.sqdist.spaceTime(data.Xxy, data.ns, data.nt);
-    assert(all(D(:) == data.D(:)));
 
     isLog = true;
     if isLinReg
@@ -17,9 +16,6 @@ function [ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg)
 
     % test hypergrid
     hypergrid = exp(tools.gridCartesianProduct(lbs, ubs, ns));
-%     hypergrid = asd.makeHyperGrid(lbs, ubs, ns, data.ndeltas, false, isLinReg);
-    assert(all(hypergrid(:) == data.hypergrid(:)));
-
     [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, data.foldinds);
 
     % test ASD

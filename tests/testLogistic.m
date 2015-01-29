@@ -11,7 +11,10 @@ function testLogistic1(testCase)
     M = asd.logisticASDStruct(data.D);
     mlFcn = @(~) ml.fitopts('bern');
     isLinReg = false;
-    [ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg);
+    [D, hypergrid, ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg);
+    
+    assert(all(D(:) == data.D(:)));
+    assert(all(hypergrid(:) == data.hypergrid(:)));
     
     mus = cell2mat(ASD.mus);
     mus1 = cell2mat(data.ASD.mus);
