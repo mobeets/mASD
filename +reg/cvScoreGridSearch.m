@@ -1,4 +1,4 @@
-function [scores, hypers, mus] = scoreCVGridSearch(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, lbs, ubs, ns, map_opts, score_opts, isLog)
+function [scores, hypers, mus] = cvScoreGridSearch(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, lbs, ubs, ns, map_opts, score_opts, isLog)
 % solves for kernel w s.t. Y=Xw for hyperparameters using cross-validation
 % 
 % X_train, X_test [cells] - training and testing stimuli

@@ -11,10 +11,8 @@ function M = linearASDStruct(D, llstr, fitstr)
     elseif strcmp(llstr, 'gauss')
         M.llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w, hyper(2));
     end
-    M.rsqFcn = @(X_test, Y_test, w, hyper) tools.rsq(X_test*w(1:end-1) + w(end), Y_test);
-    
-    M.mapFcn = @(hyper0, D) fitopts(hyper0, D, fitstr);
-    M.mapFcnOpts = {D};
+    M.rsqFcn = @(X_test, Y_test, w, hyper) tools.rsq(X_test*w(1:end-1) + w(end), Y_test);    
+    M.mapFcn = @(hyper0) fitopts(hyper0, D, fitstr);
 
 end
 

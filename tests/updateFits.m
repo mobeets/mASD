@@ -27,21 +27,21 @@ function updateFit(fname, data, M, mlFcn, isLinReg)
     [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, data.foldinds);
 
     % test ASD
-    [scores, hyprs, mus] = reg.scoreCVGrid(X_train, Y_train, X_test, ...
-        Y_test, M.mapFcn, M.rsqFcn, hypergrid, M.mapFcnOpts, {});
+    [scores, hyprs, mus] = reg.cvScoreGrid(X_train, Y_train, X_test, ...
+        Y_test, M.mapFcn, M.rsqFcn, hypergrid, {}, {});
     data.ASD.scores = scores;
     data.ASD.hyprs = hyprs;
     data.ASD.mus = mus;
 
     % test ML
-    [scores, ~, mus] = reg.scoreCVGrid(X_train, Y_train, X_test, ...
+    [scores, ~, mus] = reg.cvScoreGrid(X_train, Y_train, X_test, ...
         Y_test, mlFcn, M.rsqFcn, [nan nan nan], {}, {});
     data.ML.scores = scores;
     data.ML.mus = mus;
 
     % test ASD grid search
-    [scores, hyprs, mus] = reg.scoreCVGridSearch(X_train, Y_train, X_test, ...
-        Y_test, M.mapFcn, M.rsqFcn, lbs, ubs, ns, M.mapFcnOpts, {}, isLog);
+    [scores, hyprs, mus] = reg.cvScoreGridSearch(X_train, Y_train, X_test, ...
+        Y_test, M.mapFcn, M.rsqFcn, lbs, ubs, ns, {}, {}, isLog);
     data.ASD_gs.scores = scores;
     data.ASD_gs.hyprs = hyprs;
     data.ASD_gs.mus = mus;

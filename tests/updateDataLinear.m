@@ -5,4 +5,4 @@ M = asd.linearASDStruct(data.D);
 mlFcn = @(~) ml.fitopts('gauss');
 isLinReg = true;
 cd tests
-updateFit(fname, data, M, mlFcn, isLinReg);
+updateFits(fname, data, M, mlFcn, isLinReg);

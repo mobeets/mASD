@@ -1,4 +1,4 @@
-function obj = scoreGridSearch(data, lbs, ubs, ns, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, ifold, lbl, isLog)
+function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, ifold, lbl, isLog)
 % 
 % fit and plot ASD and ML estimates on data, with cross-validation
 % 
@@ -22,10 +22,12 @@ function obj = scoreGridSearch(data, lbs, ubs, ns, fitFcn, fitFcnOpts, scFcn, sc
 % isLog - if lbs, ubs are in logspace
 % 
 
-    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, foldinds);
+    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, ...
+        data.Y, nan, foldinds);    
+    [scores, hypers, mus] = reg.cvScoreGridSearch(X_train, ...
+        Y_train, X_test, Y_test, fitFcn, scFcn, lbs, ubs, ns, fitFcnOpts, ...
+        scFcnOpts, isLog);
     
-    [scores, hypers, mus] = reg.scoreCVGridSearch(X_train, Y_train, X_test, ...
-        Y_test, fitFcn, scFcn, lbs, ubs, ns, fitFcnOpts, scFcnOpts, isLog);
     obj.scores = scores;
     obj.hyper = hypers; % this is now nfolds long
     obj.mus = mus;

@@ -1,4 +1,4 @@
-function [scores, hypers, mus] = scoreCVGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, hypergrid, map_opts, score_opts)
+function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, hypergrid, map_opts, score_opts)
 % solves for kernel w s.t. Y=Xw for hyperparameters in hypergrid
 %   using cross-validation
 % 
