@@ -9,12 +9,18 @@ function updateFit(fname, data, M, mlFcn, isLinReg)
     data.D = D;
 
     isLog = true;
-    lbs = [-3, -2, -5];
-    ubs = [3, 10, 10];
-    ns = 5*ones(1,3);
+    if isLinReg
+        lbs = [-3 -2 -5 -5];
+        ubs = [3 10 10 10];
+        ns = 5*ones(1,4);
+    else
+        lbs = [-3 -5 -5];
+        ubs = [3 10 10];
+        ns = 5*ones(1,3);
+    end
 
     % test hypergrid
-    hypergrid = asd.makeHyperGrid(lbs, ubs, ns, data.ndeltas, false, isLinReg);
+    hypergrid = exp(tools.gridCartesianProduct(lbs, ubs, ns));
     data.hypergrid = hypergrid;
 
     [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, data.foldinds);
