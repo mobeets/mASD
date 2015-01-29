@@ -13,7 +13,26 @@ function M = linearASDStruct(D, llstr, fitstr)
     end
     M.rsqFcn = @(X_test, Y_test, w, hyper) tools.rsq(X_test*w(1:end-1) + w(end), Y_test);
     
-    M.mapFcn = @(hyper0, D) asd.gauss.fitopts(hyper0, D, fitstr);
+    M.mapFcn = @(hyper0, D) fitopts(hyper0, D, fitstr);
     M.mapFcnOpts = {D};
 
+end
+
+function opts = fitopts(hyper0, D, fitstr)
+% given a hyperparameter, calculate the MAP estimate
+%   with gaussian likelihood (closed form)
+    if nargin < 3
+        fitstr = '';
+    end
+    opts.fitIntercept = true;
+    opts.centerX = false;
+    if strcmpi(fitstr, 'evi')
+        opts.hyperFcn = @asd.gauss.optMinNegLogEvi;
+        opts.hyperFcnArgs = {D, hyper0, true, false};
+    else
+        opts.hyperFcn = @(X, Y, hyper) hyper;
+        opts.hyperFcnArgs = {hyper0};
+    end
+    opts.muFcn = @asd.gauss.calcMAP;
+    opts.muFcnArgs = {D};
 end
