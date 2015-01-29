@@ -6,6 +6,7 @@ function v = prior(ro, Ds, deltas)
 % deltas - (nd x 1) - float, the weighting of D
 % 
     vs = 0.0;
+    assert(size(Ds,3) == numel(deltas));
     for ii = 1:numel(deltas)
         vs = vs + Ds(:,:,ii)/(deltas(ii)^2);
     end

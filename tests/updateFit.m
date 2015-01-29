@@ -3,6 +3,7 @@ function updateFit(fname, data, M, mlFcn, isLinReg)
     if ~checkContinue()
         return;
     end
+    cd ..
     
     % test distance matrix construction
     D = asd.sqdist.spaceTime(data.Xxy, data.ns, data.nt);
@@ -46,10 +47,11 @@ function updateFit(fname, data, M, mlFcn, isLinReg)
     data.ASD_gs.mus = mus;
     
     save(fname, '-struct', 'data');
+    cd tests
 end
 
-function stop = checkContinue()
-    stop = false;
+function cont = checkContinue()
+    cont = true;
     orig_state = warning;   
     warning('off', 'backtrace');
     warning('This will erase all test data and replace with new results.');
@@ -57,6 +59,6 @@ function stop = checkContinue()
     m = input('Continue? ','s');
     if ~strcmpi(m, 'yes')
         disp('That''s what I thought.');
-        stop = false;
+        cont = false;
     end
 end

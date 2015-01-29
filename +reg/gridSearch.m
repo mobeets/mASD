@@ -81,4 +81,4 @@ while any(DeltaX > minDeltaX) && (abs(BestF - LastBestF) > tol) && (niters <= ma
   X = lbs; % set initial X
   nzooms = nzooms + 1;
 end
-nzooms
+disp(['zooms = ' num2str(nzooms)]);
