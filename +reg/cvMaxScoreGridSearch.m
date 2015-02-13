@@ -1,4 +1,4 @@
-function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, ifold, lbl, isLog)
+function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, isLog)
 % 
 % fit and plot ASD and ML estimates on data, with cross-validation
 % 
@@ -31,9 +31,4 @@ function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn, fitFcnOpts, scFc
     obj.scores = scores;
     obj.hyper = hypers; % this is now nfolds long
     obj.mus = mus;
-    sc = obj.scores{ifold};
-    wf = obj.mus{ifold};
-    obj.fig = plot.prepAndPlotKernel(data.Xxy, wf, data.ns, data.nt, ifold, lbl, sc);
-    obj.foldinds = foldinds;
-    
 end

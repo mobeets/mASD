@@ -1,4 +1,4 @@
-function [obj, wf, sc] = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds, lbl, ifold)
+function obj = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds)
 % 
 % fit and plot estimates on data, with cross-validation
 % 
@@ -29,9 +29,5 @@ function [obj, wf, sc] = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, scF
     obj.hyper = hyper;
     obj.scores = scs;
     obj.mus = mu;
-    obj.foldinds = foldinds;
-    obj.label = lbl; 
-    
-    wf = obj.mus{ifold};
-    sc = obj.scores(ifold);
+
 end
