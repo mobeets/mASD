@@ -9,10 +9,6 @@ function [L,dL,ddL] = neglogli_bernoulliGLM(wts,X,Y)
 %   X [N x m] - regressors
 %   Y [N x 1] - output (binary vector of 1s and 0s).
 
-if size(wts,1) == size(X,2)+1
-    % wts includes DC term
-    X = [X ones(size(X,1),1)];
-end
 xproj = X*wts;
 
 if nargout <= 1

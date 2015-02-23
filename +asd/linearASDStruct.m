@@ -6,12 +6,18 @@ function M = linearASDStruct(D, llstr, fitstr)
         fitstr = '';
     end
     
+    addones = @(X) [X ones(size(X,1),1)];
     if strcmp(llstr, 'poiss')
-        M.llFcn = @(X_test, R_test, w, hyper) -tools.neglogli_poissGLM(w(1:end-1), X_test, R_test, @tools.expfun);
+        M.llFcn = @(trials, w, hyper) -tools.neglogli_poissGLM(...
+            w, addones(trials.x_test), trials.y_test, @tools.expfun);
+%         M.llFcn = @(X_test, R_test, w, hyper) -tools.neglogli_poissGLM(w(1:end-1), X_test, R_test, @tools.expfun);
     elseif strcmp(llstr, 'gauss')
-        M.llFcn = @(X_test, Y_test, w, hyper) asd.gauss.logLikelihood(Y_test, X_test, w, hyper(2));
+%         M.llFcn = @(X_test, Y_test, w, hyper) ...
+%             asd.gauss.logLikelihood(Y_test, X_test, w, hyper(2));
+        M.llFcn = @(trials, w, hyper) asd.gauss.logLikelihood(...
+            trials.y_test, addones(trials.x_test), w, hyper(2));
     end
-    M.rsqFcn = @(X_test, Y_test, w, hyper) tools.rsq(X_test*w(1:end-1) + w(end), Y_test);    
+    M.rsqFcn = @(trials, w, hyper) tools.rsq(addones(trials.x_test)*w, trials.y_test);
     M.mapFcn = @(hyper0) fitopts(hyper0, D, fitstr);
 
 end

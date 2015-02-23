@@ -30,6 +30,8 @@ function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, X_test, Y_test, m
         x_test = X_test{ii};
         y_train = Y_train{ii};
         y_test = Y_test{ii};
+        trials = struct('x_train', x_train, 'y_train', y_train, ...
+            'x_test', x_test, 'y_test', y_test);
         for jj = 1:nhypers
             if mod(jj, round(nhypers/5)) == 0
                 disp(['HYPER #' num2str(jj) ' of ' num2str(nhypers)]);
@@ -39,7 +41,7 @@ function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, X_test, Y_test, m
             mu = [w; b];
             mus{jj, ii} = mu;
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
-            scores(jj, ii) = scoreFcn(x_test, y_test, mu, hyper, score_opts{:});
+            scores(jj, ii) = scoreFcn(trials, mu, hyper, score_opts{:});
         end
     end
 end

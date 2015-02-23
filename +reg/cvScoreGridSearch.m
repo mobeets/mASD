@@ -32,9 +32,11 @@ function [scores, hypers, mus] = cvScoreGridSearch(X_train, Y_train, X_test, Y_t
         x_test = X_test{ii};
         y_train = Y_train{ii};
         y_test = Y_test{ii};
+        trials = struct('x_train', x_train, 'y_train', y_train, ...
+            'x_test', x_test, 'y_test', y_test);
         
         wts = @(hyper) mapFcnHandle(mapFcn, x_train, y_train, hyper, map_opts);
-        score = @(hyper) -scoreFcn(x_test, y_test, wts(h(hyper)), h(hyper), score_opts{:});
+        score = @(hyper) -scoreFcn(trials, wts(h(hyper)), h(hyper), score_opts{:});
         [mxHyper, mxScore] = reg.gridSearch(score, lbs, ubs, ns);
         
         mxHyper = h(mxHyper); % map back to non-log space, if necessary
