@@ -1,9 +1,15 @@
-function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(X, Y, nfolds, inds)
+function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(...
+    X, Y, nfolds, inds)
+% function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(...
+%     X, Y, nfolds, inds)
+% 
 % returns training and testing sets for X and Y, as cell array
 %   e.g. X_train{1} returns first training set for X
 % 
-% X is 1d or 2d, size [ny ?]
-% Y is 1d or 2d, size [ny ?]
+% X - 1d or 2d, size [ny ?]
+% Y - 1d or 2d, size [ny ?]
+% nfolds - # of folds to generate
+% inds - fold assignments for rows of X and Y
 % 
     if nargin < 4 || all(isnan(inds))
         ny = numel(Y);

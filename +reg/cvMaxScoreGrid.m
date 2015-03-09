@@ -1,20 +1,26 @@
-function obj = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, scFcn, scFcnOpts, foldinds)
+function obj = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, ...
+    scFcn, scFcnOpts, foldinds)
+% obj = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, ...
+% scFcn, scFcnOpts, foldinds)
 % 
-% fit and plot estimates on data, with cross-validation
+% fit and plot estimates on data, with cross-validation, by gridding
+%   the hyperparameters and maximizing the test score
 % 
-% data - struct
+% data - struct of full data
 %   data.X
 %   data.Y
 %   data.Xxy
 %   data.ns
 %   data.nt
-% 
-% hypergrid - grid of hyperparameters to test M.mapFcn on
-% nfolds - # of folds in cross-validation
-% ifold - fold to use for generating ASD figure
+% hypergrid - grid of hyperparameters to use for generating fits
+% fitFcn - for generating a fit given training data
+% scFcn - for evaluating goodness of fit on testing data
+% fitFcnOpts, scFcnOpts - optional arguments passed to respective functions
+% foldinds - cross-validation fold indices
 % 
 
-    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, data.Y, nan, foldinds);
+    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, ...
+        data.Y, nan, foldinds);
     [scores, ~, mus] = reg.cvScoreGrid(X_train, Y_train, X_test, ...
         Y_test, fitFcn, scFcn, hypergrid, fitFcnOpts, scFcnOpts);
     

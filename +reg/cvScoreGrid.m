@@ -1,6 +1,12 @@
-function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, X_test, Y_test, mapFcn, scoreFcn, hypergrid, map_opts, score_opts)
-% solves for kernel w s.t. Y=Xw for hyperparameters in hypergrid
-%   using cross-validation
+function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, ...
+    X_test, Y_test, mapFcn, scoreFcn, hypergrid, mapFcnOpts, scoreFcnOpts)
+% function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, ...
+%     X_test, Y_test, mapFcn, scoreFcn, hypergrid, map_opts, score_opts)
+% 
+% for each data set in cross-validation folds,
+%   for each hyperparameter set in hypergrid,
+%      solves for kernel w s.t. Y=X*mu + b
+%      and returns the resulting score
 % 
 % X_train, X_test [cells] - training and testing stimuli
 % Y_train, Y_test [cells] - training and testing responses
@@ -10,10 +16,9 @@ function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, X_test, Y_test, m
 %   - also returns hyper, if changed
 % scoreFcn(X, Y, w, hyper, opts) [function handle]
 %   - evaluates the test score (e.g. test likelihood) of w s.t. Y=Xw
-% nfolds [numeric] - # of folds in cross-validation
 % hypergrid [matrix] - hyperparameters to score for each fold of cv
-% map_opts [struct] - optional data passed to scoreFcn
-% score_opts [struct] - optional data passed to scoreFcn
+% mapFcnOpts [struct] - optional data passed to scoreFcn
+% scoreFcnOpts [struct] - optional data passed to scoreFcn
 % 
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
@@ -37,11 +42,12 @@ function [scores, hypers, mus] = cvScoreGrid(X_train, Y_train, X_test, Y_test, m
                 disp(['HYPER #' num2str(jj) ' of ' num2str(nhypers)]);
             end
             hyper0 = hypergrid(jj,:);
-            [w, b, hyper] = reg.fitHypersAndWeights(x_train, y_train, mapFcn(hyper0, map_opts{:}));
+            [w, b, hyper] = reg.fitHypersAndWeights(x_train, y_train, ...
+                mapFcn(hyper0, mapFcnOpts{:}));
             mu = [w; b];
             mus{jj, ii} = mu;
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
-            scores(jj, ii) = scoreFcn(trials, mu, hyper, score_opts{:});
+            scores(jj, ii) = scoreFcn(trials, mu, hyper, scoreFcnOpts{:});
         end
     end
 end

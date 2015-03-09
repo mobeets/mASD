@@ -1,4 +1,8 @@
 function [X, Y, X_mean, Y_mean] = centerData(X, Y, fitIntercept, centerX)
+% function [X, Y, X_mean, Y_mean] = centerData(X, Y, fitIntercept, centerX)
+% 
+% if fitIntercept, centers X, Y by subtracting off their respective means
+% 
     if nargin < 4
         centerX = true;
     end
