@@ -1,4 +1,4 @@
-function mu = runBilinear()
+function mu = runBilinear(doReshape)
     rng(10431);
     ny = 1000; ns = 10; nt = 4;
     X = rand(ny, ns, nt);
@@ -14,6 +14,12 @@ function mu = runBilinear()
     opts.maxiters = 100;
     opts.tol = 1e-5;
     opts.wt0 = ones(size(X,3),1);
-
-    mu = reg.calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts);
+    
+    if doReshape
+        X = reshape(X, ny, ns*nt);
+        opts.shape = {ns, nt};
+        mu = reg.calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts);
+    else
+        mu = reg.calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts);
+    end
 end

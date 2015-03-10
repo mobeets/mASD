@@ -1,6 +1,7 @@
 if ~checkContinue()
     return;
 end
-mu = runBilinear();
+mu.normal = runBilinear(false);
+mu.reshaped = runBilinear(true);
 fname = 'testDataBilinear.mat';
-save(fname, 'mu');
+save(fname, '-struct', 'mu');

@@ -7,7 +7,13 @@ function setup(testCase)
 end
 
 function testBilinear1(testCase)
-    data = load('tests/testDataBilinear.mat');
-    mu = runBilinear();
-    assert(all(data.mu(:) == mu(:)));
+    mu0 = load('tests/testDataBilinear.mat');
+    mu = runBilinear(false);
+    assert(all(mu0.normal(:) == mu(:)));
+end
+
+function testBilinear2(testCase)
+    mu0 = load('tests/testDataBilinear.mat');
+    mu = runBilinear(true);
+    assert(all(mu0.reshaped(:) == mu(:)));
 end

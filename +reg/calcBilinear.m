@@ -4,7 +4,7 @@ function mu = calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts)
 % solves for space and time weights using alternating least squares
 %   where time weights are fit with tFcn, and space weights with sFcn
 % 
-% X [ny x ns x nt]
+% X [ny x ns x nt] or [ny x nw]
 % Y [ny x 1]
 % sFcn - space marginal fitting function
 % sFcnOpts [cell] - optional arguments passed to sFcn
@@ -14,6 +14,7 @@ function mu = calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts)
 %   .maxiters - max number of iterations of ALS
 %   .tol - if the marginal sum change of mu is less than this, stop
 %   .wt0 - initial time weights
+%   .shape - if X is [ny x nw], this specifies how to decompose nw
 % 
 % example:
 %   sFcn = @asd.gauss.calcMAP;
@@ -23,6 +24,12 @@ function mu = calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts)
 %
     if nargin < 7
         opts = struct();
+    end    
+    if size(X,3) == 1 && isfield(opts, 'shape')
+        X = reshape(X, size(X,1), opts.shape{:});
+        isReshaped = true;
+    else
+        isReshaped = false;
     end
     if ~isfield(opts, 'maxiters')
         opts.maxiters = 100;
@@ -47,6 +54,9 @@ function mu = calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts)
             break;
         end
         muPrev = mu;
+    end
+    if isReshaped
+        mu = reshape(mu, prod([opts.shape{:}]), 1);
     end
 end
 

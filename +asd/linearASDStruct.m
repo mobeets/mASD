@@ -1,10 +1,13 @@
-function M = linearASDStruct(D, llstr, fitstr)
-    if nargin < 2
-        llstr = 'gauss';
+function M = linearASDStruct(D, llstr, fitstr, opts)
+    if nargin < 4
+        opts = struct();
     end
     if nargin < 3
         fitstr = '';
     end
+    if nargin < 2
+        llstr = 'gauss';
+    end    
     
     addones = @(X) [X ones(size(X,1),1)];
     if strcmp(llstr, 'poiss')
@@ -15,32 +18,29 @@ function M = linearASDStruct(D, llstr, fitstr)
             trials.y_test, addones(trials.x_test), w, hyper(2));
     end
     M.rsqFcn = @(trials, w, hyper) tools.rsq(addones(trials.x_test)*w, trials.y_test);
-    M.mapFcn = @(hyper0) fitopts(hyper0, D, fitstr);
+    M.mapFcn = @(hyper0) makeMapFcn(hyper0, D, fitstr, opts);
 
 end
 
-function opts = fitopts(hyper0, D, fitstr)
+function fcnopts = makeMapFcn(hyper0, D, fitstr, opts)
 % 
 % given a hyperparameter, calculate the MAP estimate
 %   with gaussian likelihood (closed form)
 % 
-    if nargin < 3
-        fitstr = '';
-    end
-    opts.fitIntercept = true;
-    opts.centerX = false;
+    fcnopts.fitIntercept = true;
+    fcnopts.centerX = false;
     if strcmpi(fitstr, 'evi')
-        opts.hyperFcn = @asd.gauss.optMinNegLogEvi;
-        opts.hyperFcnArgs = {D, hyper0, true, false};
+        fcnopts.hyperFcn = @asd.gauss.optMinNegLogEvi;
+        fcnopts.hyperFcnArgs = {D, hyper0, true, false};
     else
-        opts.hyperFcn = @(X, Y, hyper) hyper;
-        opts.hyperFcnArgs = {hyper0};
+        fcnopts.hyperFcn = @(X, Y, hyper) hyper;
+        fcnopts.hyperFcnArgs = {hyper0};
     end
     if strcmpi(fitstr, 'bilinear')
-        opts.muFcn = @(X, Y, hyper, D) asd.reg.calcBilinear(X, Y, ...
-            asd.gauss.calcMAP, {hyper, D}, ml.calcGaussML, {}, struct());
+        fcnopts.muFcn = @(X, Y, hyper, D) reg.calcBilinear(X, Y, ...
+            @asd.gauss.calcMAP, {hyper, D}, @ml.calcGaussML, {}, opts);
     else
-        opts.muFcn = @asd.gauss.calcMAP;
+        fcnopts.muFcn = @asd.gauss.calcMAP;
     end
-    opts.muFcnArgs = {D};
+    fcnopts.muFcnArgs = {D};
 end

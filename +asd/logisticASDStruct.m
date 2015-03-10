@@ -1,4 +1,7 @@
-function M = logisticASDStruct(D, fitstr)
+function M = logisticASDStruct(D, fitstr, opts)
+    if nargin < 3
+        opts = struct();
+    end
     if nargin < 2
         fitstr = '';
     end
@@ -20,28 +23,25 @@ function M = logisticASDStruct(D, fitstr)
                 trials.y_test, 1, hyper)); % null model
 %             M.llFcn0(trials.y_test, trials.y_test, 1, hyper), ...  % saturated model
 
-    M.mapFcn = @(hyper0) fitopts(hyper0, D, fitstr);
+    M.mapFcn = @(hyper0) makeMapFcn(hyper0, D, fitstr, opts);
 
 end
 
-function opts = fitopts(hyper0, D, fitstr)
-    if nargin < 3
-        fitstr = '';
-    end
+function fcnopts = makeMapFcn(hyper0, D, fitstr, opts)
     if strcmpi(fitstr, 'evi')
-        opts.hyperFcn = @asd.bern.optMinNegLogEvi;
-        opts.hyperFcnArgs = {hyper0, D, true};
+        fcnopts.hyperFcn = @asd.bern.optMinNegLogEvi;
+        fcnopts.hyperFcnArgs = {hyper0, D, true};
     else
-        opts.hyperFcn = @(X, Y, hyper) hyper;
-        opts.hyperFcnArgs = {hyper0};
+        fcnopts.hyperFcn = @(X, Y, hyper) hyper;
+        fcnopts.hyperFcnArgs = {hyper0};
     end
-    opts.fitIntercept = true;
-    opts.centerX = false;
+    fcnopts.fitIntercept = true;
+    fcnopts.centerX = false;
     if strcmpi(fitstr, 'bilinear')
-        opts.muFcn = @(X, Y, hyper, D) asd.reg.calcBilinear(X, Y, ...
-            asd.bern.calcMAP, {hyper, D}, ml.calcBernML, {}, struct());
+        fcnopts.muFcn = @(X, Y, hyper, D) reg.calcBilinear(X, Y, ...
+            @asd.bern.calcMAP, {hyper, D}, @ml.calcBernML, {}, opts);
     else
-        opts.muFcn = @asd.bern.calcMAP;
+        fcnopts.muFcn = @asd.bern.calcMAP;
     end
-    opts.muFcnArgs = {D};
+    fcnopts.muFcnArgs = {D};
 end
