@@ -1,4 +1,4 @@
-function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn,...
+function obj = cvMaxScoreGridSearch(X, Y, lbs, ubs, ns, fitFcn,...
     fitFcnOpts, scFcn, scFcnOpts, foldinds, isLog)
 % function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn,...
 %     fitFcnOpts, scFcn, scFcnOpts, foldinds, isLog)
@@ -6,12 +6,7 @@ function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn,...
 % fit and plot estimates on data, with cross-validation, by searching
 %   through hyperparameter space using gridding and zooming
 % 
-% data - struct of full data
-%   data.X
-%   data.Y
-%   data.Xxy
-%   data.ns
-%   data.nt
+% X, Y - full data
 % lbs, ubs, ns - bounds and bins hyperparameter space
 % fitFcn - for generating a fit given training data
 % scFcn - for evaluating goodness of fit on testing data
@@ -20,8 +15,8 @@ function obj = cvMaxScoreGridSearch(data, lbs, ubs, ns, fitFcn,...
 % isLog - specifies whether hyperparameter space is log-transformed
 % 
 
-    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(data.X, ...
-        data.Y, nan, foldinds);    
+    [X_train, Y_train, X_test, Y_test] = reg.trainAndTestKFolds(X, Y, ...
+        nan, foldinds);    
     [scores, hypers, mus] = reg.cvScoreGridSearch(X_train, ...
         Y_train, X_test, Y_test, fitFcn, scFcn, lbs, ubs, ns, ...
         fitFcnOpts, scFcnOpts, isLog);

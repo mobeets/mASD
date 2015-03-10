@@ -37,6 +37,11 @@ function opts = fitopts(hyper0, D, fitstr)
     end
     opts.fitIntercept = true;
     opts.centerX = false;
-    opts.muFcn = @asd.bern.calcMAP;
+    if strcmpi(fitstr, 'bilinear')
+        opts.muFcn = @(X, Y, hyper, D) asd.reg.calcBilinear(X, Y, ...
+            asd.bern.calcMAP, {hyper, D}, ml.calcBernML, {}, struct());
+    else
+        opts.muFcn = @asd.bern.calcMAP;
+    end
     opts.muFcnArgs = {D};
 end

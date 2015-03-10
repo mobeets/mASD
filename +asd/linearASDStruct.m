@@ -20,8 +20,10 @@ function M = linearASDStruct(D, llstr, fitstr)
 end
 
 function opts = fitopts(hyper0, D, fitstr)
+% 
 % given a hyperparameter, calculate the MAP estimate
 %   with gaussian likelihood (closed form)
+% 
     if nargin < 3
         fitstr = '';
     end
@@ -34,6 +36,11 @@ function opts = fitopts(hyper0, D, fitstr)
         opts.hyperFcn = @(X, Y, hyper) hyper;
         opts.hyperFcnArgs = {hyper0};
     end
-    opts.muFcn = @asd.gauss.calcMAP;
+    if strcmpi(fitstr, 'bilinear')
+        opts.muFcn = @(X, Y, hyper, D) asd.reg.calcBilinear(X, Y, ...
+            asd.gauss.calcMAP, {hyper, D}, ml.calcGaussML, {}, struct());
+    else
+        opts.muFcn = @asd.gauss.calcMAP;
+    end
     opts.muFcnArgs = {D};
 end
