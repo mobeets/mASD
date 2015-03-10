@@ -60,6 +60,7 @@ Running tests:
 ```
 >> runtests('tests/testLinear.m')
 >> runtests('tests/testLogistic.m')
+>> runtests('tests/testBilinear.m')
 ```
 
 Updating tests:
@@ -68,4 +69,5 @@ Updating tests:
 >> cd tests
 >> updateDataLinear
 >> updateDataLogistic
+>> updateDataBilinear
 ```
