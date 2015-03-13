@@ -35,7 +35,7 @@ function mu = calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts)
         opts.maxiters = 100;
     end
     if ~isfield(opts, 'tol')
-        opts.tol = 1e-6;
+        opts.tol = 1e-5;
     end
     if ~isfield(opts, 'wt0')        
         wt = ones(size(X,3),1);
@@ -45,10 +45,9 @@ function mu = calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts)
     
     muPrev = nan(size(X,2),size(X,3));
     for ii = 1:opts.maxiters
-        Xt = Xwt(X, wt);
-        ws = sFcn(Xt, Y, sFcnOpts{:});
-        Xs = Xws(X, ws);
-        wt = tFcn(Xs, Y, tFcnOpts{:});
+        ws = sFcn(Xwt(X, wt), Y, sFcnOpts{:});
+        wt = tFcn(Xws(X, ws), Y, tFcnOpts{:});
+
         mu = ws*wt';
         if abs(sum(sum(mu - muPrev))) < opts.tol
             break;

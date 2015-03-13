@@ -1,5 +1,4 @@
-function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(...
-    X, Y, nfolds, inds)
+function [trials, inds] = trainAndTestKFolds(X, Y, nfolds, inds)
 % function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(...
 %     X, Y, nfolds, inds)
 % 
@@ -28,4 +27,6 @@ function [X_train, Y_train, X_test, Y_test, inds] = trainAndTestKFolds(...
         Y_train{ii} = Y(~idx,:);
         Y_test{ii} = Y(idx,:);
     end
+    trials = struct('x_train', X_train, 'y_train', Y_train, ...
+        'x_test', X_test, 'y_test', Y_test);
 end
