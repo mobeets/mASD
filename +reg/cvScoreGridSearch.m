@@ -24,30 +24,29 @@ function [scores, hypers, mus] = cvScoreGridSearch(trials, mapFcn, ...
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
 % 
-    nfolds = numel(trials);
-    scores = cell(nfolds,1);
-    hypers = cell(nfolds,1);
-    mus = cell(nfolds,1);
-    
     h = @(x) isLog*exp(x) + (1-isLog)*x;
+    getScore = @(hyper) totalScore(hyper, trials, mapFcn, mapFcnOpts, ...
+        scoreFcn, scoreFcnOpts, h);
+    [~, ~, hypers, scores] = reg.gridSearch(getScore, ...
+        lbs, ubs, ns);
+    hypers = h(hypers); % map back to non-log space, if necessary
+    scores = -scores;
+    mus = [];
+end
+
+function score = totalScore(hyper, trials, mapFcn, mapFcnOpts, ...
+    scoreFcn, scoreFcnOpts, h)
+% 
+    wts = @(hyper, ii) mapFcnHandle(mapFcn, trials(ii).x_train, ...
+        trials(ii).y_train, hyper, mapFcnOpts);
     
-    % todo: have score function average across folds
-    %     since we want hyper selection to be about total performance
+    nfolds = numel(trials);
+    scores = nan(nfolds, 1);
     for ii = 1:nfolds
-        disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);
-        ctrials = trials(ii);
-        
-        wts = @(hyper) mapFcnHandle(mapFcn, ctrials.x_train, ...
-            ctrials.y_train, hyper, mapFcnOpts);
-        score = @(hyper) -scoreFcn(ctrials, wts(h(hyper)), h(hyper), ...
+        scores(ii) = -scoreFcn(trials(ii), wts(h(hyper), ii), h(hyper), ...
             scoreFcnOpts{:});
-        [mxHyper, mxScore] = reg.gridSearch(score, lbs, ubs, ns);
-        
-        mxHyper = h(mxHyper); % map back to non-log space, if necessary
-        mus{ii} = wts(mxHyper);
-        hypers{ii} = mxHyper;
-        scores{ii} = -mxScore; % scores are negative, so reverse this
     end
+    score = mean(scores);
 end
 
 function mu = mapFcnHandle(mapFcn, x, y, hyper0, map_opts)

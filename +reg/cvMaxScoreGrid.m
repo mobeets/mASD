@@ -1,7 +1,7 @@
 function obj = cvMaxScoreGrid(X, Y, hypergrid, fitFcn, fitFcnOpts, ...
     scFcn, scFcnOpts, foldinds, evalinds)
 % obj = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, ...
-% scFcn, scFcnOpts, foldinds)
+% scFcn, scFcnOpts, foldinds, evalinds)
 % 
 % fit and plot estimates on data, with cross-validation, by gridding
 %   the hyperparameters and maximizing the test score
@@ -12,15 +12,14 @@ function obj = cvMaxScoreGrid(X, Y, hypergrid, fitFcn, fitFcnOpts, ...
 % scFcn - for evaluating goodness of fit on testing data
 % fitFcnOpts, scFcnOpts - optional arguments passed to respective functions
 % foldinds - cross-validation fold indices
-% evalinds - evaluation set indices
+% evalinds - development/evaluation set indices
 % 
 
     % split X, Y into development/evaluation sets    
     evaltrials = reg.trainAndTest(X, Y, nan, evalinds);
     
     % find best hyperparameter on development set
-    % n.b. development/evaluation sets still overlap, which is dumb, but I
-    % don't want to deal with nans in some cells...my bad
+    % n.b. development/evaluation sets still overlap, which is dumb
     devtrials = reg.trainAndTestKFolds(X, Y, nan, foldinds);
     [scores, ~, mus] = reg.cvScoreGrid(devtrials, fitFcn, scFcn, ...
         hypergrid, fitFcnOpts, scFcnOpts);

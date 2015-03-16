@@ -6,14 +6,14 @@ function [trials, trninds] = trainAndTest(X, Y, trainPct, inds)
 % 
     if nargin < 4
         ny = numel(Y);
-        [trninds, tstinds] = crossvalind('HoldOut', ones(ny, 1), 1-trainPct);
+        [trninds, ~] = crossvalind('HoldOut', ones(ny, 1), 1-trainPct);
     else
         trninds = inds;
     end
     X0 = X(trninds,:);
-    X1 = X(tstinds,:);
+    X1 = X(~trninds,:);
     Y0 = Y(trninds,:);
-    Y1 = Y(tstinds,:);
+    Y1 = Y(~trninds,:);
     trials = struct('x_train', X0, 'y_train', Y0, ...
         'x_test', X1, 'y_test', Y1);
 end
