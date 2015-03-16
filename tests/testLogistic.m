@@ -8,60 +8,57 @@ end
 
 function testLogistic1(testCase)
     data = load('tests/testDataLogistic.mat');
-    M = asd.logisticASDStruct(data.D);
-    mlFcn = @(~) ml.fitopts('bern');
+    llstr = 'bern';
+    scorestr = 'pseudoRsq';
+    scoreFcn = reg.scoreFcns(scorestr, llstr);
+    MAP = @(hyper) asd.fitHandle(hyper, data.D, llstr);
+    ML = @(~) ml.fitHandle(llstr);
     isLinReg = false;
     fit = 'ASD';
-    [~, ~, ASD] = runFits(data, M, mlFcn, isLinReg, fit);
+    [~, ~, ASD] = runFits(data, MAP, ML, scoreFcn, isLinReg, fit);
     
-    mus = cell2mat(ASD.mus);
-    mus1 = cell2mat(data.ASD.mus);
-    assert(all(ASD.scores(:) == data.ASD.scores(:)));
-    assert(all(ASD.hyprs(:) == data.ASD.hyprs(:)));
-    assert(all(mus(:) == mus1(:)));
+    isequaln(ASD, data.ASD);
 
 end
 
 function testLogistic2(testCase)
     data = load('tests/testDataLogistic.mat');
-    M = asd.logisticASDStruct(data.D);
-    mlFcn = @(~) ml.fitopts('bern');
+    llstr = 'bern';
+    scorestr = 'pseudoRsq';
+    scoreFcn = reg.scoreFcns(scorestr, llstr);
+    MAP = @(hyper) asd.fitHandle(hyper, data.D, llstr);
+    ML = @(~) ml.fitHandle(llstr);
     isLinReg = false;
     fit = 'ML';
-    [~, ~, ML] = runFits(data, M, mlFcn, isLinReg, fit);
+    [~, ~, ML] = runFits(data, MAP, ML, scoreFcn, isLinReg, fit);
     
-    mus = cell2mat(ML.mus);
-    mus1 = cell2mat(data.ML.mus);
-    assert(all(ML.scores(:) == data.ML.scores(:)));
-    assert(all(mus(:) == mus1(:)));
+    isequaln(ML, data.ML);
 end
 
 function testLogistic3(testCase)
     data = load('tests/testDataLogistic.mat');
-    M = asd.logisticASDStruct(data.D);
-    mlFcn = @(~) ml.fitopts('bern');
+    llstr = 'bern';
+    scorestr = 'pseudoRsq';
+    scoreFcn = reg.scoreFcns(scorestr, llstr);
+    MAP = @(hyper) asd.fitHandle(hyper, data.D, llstr);
+    ML = @(~) ml.fitHandle(llstr);
     isLinReg = false;
     fit = 'ASD_gs';
-    [~, ~, ASD_gs] = runFits(data, M, mlFcn, isLinReg, fit);
+    [~, ~, ASD_gs] = runFits(data, MAP, ML, scoreFcn, isLinReg, fit);
     
-    mus = ASD_gs.mus;
-    mus1 = data.ASD_gs.mus;
-    scores = ASD_gs.scores;
-    scores1 = data.ASD_gs.scores;
-    hyprs = ASD_gs.hyprs;
-    hyprs1 = data.ASD_gs.hyprs;
-    assert(all(scores(:) == scores1(:)));
-    assert(all(hyprs(:) == hyprs1(:)));
-    assert(all(mus(:) == mus1(:)));
+    isequaln(ASD_gs, data.ASD_gs);
 end
 
 function testLogistic4(testCase)
     data = load('tests/testDataLogistic.mat');
-    M = asd.logisticASDStruct(data.D);
-    mlFcn = @(~) ml.fitopts('bern');
+    llstr = 'bern';
+    scorestr = 'pseudoRsq';
+    scoreFcn = reg.scoreFcns(scorestr, llstr);
+    MAP = @(hyper) asd.fitHandle(hyper, data.D, llstr);
+    ML = @(~) ml.fitHandle(llstr);
     isLinReg = false;
     fit = '';
-    [D, hypergrid, ~] = runFits(data, M, mlFcn, isLinReg, fit);
+    [D, hypergrid, ~] = runFits(data, MAP, ML, scoreFcn, isLinReg, fit);
     
     assert(all(D(:) == data.D(:)));
     assert(all(hypergrid(:) == data.hypergrid(:)));

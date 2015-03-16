@@ -1,14 +1,14 @@
-function updateFits(fname, data, M, mlFcn, isLinReg)
+function updateFits(fname, data, MAP, ML, scoreFcn, isLinReg)
     % verify erasing of previous results
     if ~checkContinue()
         return;
     end
     
-    [D, hypergrid, ASD] = runFits(data, M, mlFcn, isLinReg, 'ASD');
-    [~, ~, ML] = runFits(data, M, mlFcn, isLinReg, 'ML');
-    [~, ~, ASD_m] = runFits(data, M, mlFcn, isLinReg, 'ASD_mother');
-    [~, ~, ASD_gs] = runFits(data, M, mlFcn, isLinReg, 'ASD_gs');
-    [~, ~, ASD_gs_m] = runFits(data, M, mlFcn, isLinReg, 'ASD_gs_mother');
+    [D, hypergrid, ASD] = runFits(data, MAP, ML, scoreFcn, isLinReg, 'ASD');
+    [~, ~, ML] = runFits(data, MAP, ML, scoreFcn, isLinReg, 'ML');
+    [~, ~, ASD_m] = runFits(data, MAP, ML, scoreFcn, isLinReg, 'ASD_mother');
+    [~, ~, ASD_gs] = runFits(data, MAP, ML, scoreFcn, isLinReg, 'ASD_gs');
+    [~, ~, ASD_gs_m] = runFits(data, MAP, ML, scoreFcn, isLinReg, 'ASD_gs_mother');
     
     data.D = D;
     data.hypergrid = hypergrid;

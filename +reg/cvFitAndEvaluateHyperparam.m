@@ -1,9 +1,8 @@
-function obj = cvFitAndEvaluateHyperparam(obj, trials, fcns)
+function obj = cvFitAndEvaluateHyperparam(obj, trials, fitFcn, scoreFcn)
     
     [w, b, hyper] = reg.fitHypersAndWeights(trials.x_train, ...
-        trials.y_train, fcns.fitFcn(obj.hyper, fcns.fitFcnOpts{:}));
+        trials.y_train, fitFcn(obj.hyper));
     obj.mu = [w; b];
     obj.hyper = hyper;
-    obj.score = fcns.scoreFcn(trials, obj.mu, obj.hyper, ...
-        fcns.scoreFcnOpts{:});
+    obj.score = scoreFcn(trials, obj.mu, obj.hyper);
 end

@@ -1,5 +1,5 @@
-function obj = cvMaxScoreGrid(X, Y, fcns, hypers, foldinds, evalinds, ...
-    searchType, hyperOpts)
+function obj = cvMaxScoreGrid(X, Y, fitFcn, scoreFcn, hypers, foldinds, ...
+    evalinds, searchType, hyperOpts)
 % obj = cvMaxScoreGrid(data, hypergrid, fitFcn, fitFcnOpts, ...
 % scFcn, scFcnOpts, foldinds, evalinds)
 % 
@@ -29,13 +29,15 @@ function obj = cvMaxScoreGrid(X, Y, fcns, hypers, foldinds, evalinds, ...
     devtrials = reg.trainAndTestKFolds(X, Y, nan, foldinds);
 
     if strcmpi(searchType, 'grid')
-        [scores, ~, mus] = reg.cvScoreGrid(devtrials, fcns, hypers);
+        [scores, ~, mus] = reg.cvScoreGrid(devtrials, fitFcn, scoreFcn, ...
+            hypers);
     elseif strcmpi(searchType, 'grid-search')
-        [scores, hypers, mus] = reg.cvScoreGridSearch(devtrials, fcns, ...
-            hyperOpts);
+        [scores, hypers, mus] = reg.cvScoreGridSearch(devtrials, ...
+            fitFcn, scoreFcn, hyperOpts);
     end
     
     % evaluate hyperparameter on evaluation set, and score
     obj = reg.cvSummarizeScores(scores, hypers, mus);
-    obj = reg.cvFitAndEvaluateHyperparam(obj, evaltrials, fcns);
+    obj = reg.cvFitAndEvaluateHyperparam(obj, evaltrials, ...
+        fitFcn, scoreFcn);
 end

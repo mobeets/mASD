@@ -2,8 +2,13 @@ cd ..
 fname = 'testDataLogistic.mat';
 data = load(fullfile('tests', fname));
 [~, data.evalinds] = reg.trainAndTest(data.X, data.Y, 0.5);
-M = asd.logisticASDStruct(data.D);
-mlFcn = @(~) ml.fitopts('bern');
+
+llstr = 'bern';
+scorestr = 'pseudoRsq';
+scoreFcn = reg.scoreFcns(scorestr, llstr);
+MAP = @(hyper) asd.fitHandle(hyper, data.D, llstr);
+ML = @(~) ml.fitHandle(llstr);
+
 isLinReg = false;
 cd tests
-updateFits(fname, data, M, mlFcn, isLinReg);
+updateFits(fname, data, MAP, ML, scoreFcn, isLinReg);
