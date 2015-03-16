@@ -4,7 +4,11 @@ function updateFits(fname, data, M, mlFcn, isLinReg)
         return;
     end
     
-    [D, hypergrid, ASD, ML, ASD_gs] = runFits(data, M, mlFcn, isLinReg);
+    [D, hypergrid, ASD] = runFits(data, M, mlFcn, isLinReg, 'ASD');
+    [~, ~, ML] = runFits(data, M, mlFcn, isLinReg, 'ML');
+    [~, ~, ASD_m] = runFits(data, M, mlFcn, isLinReg, 'ASD_mother');
+    [~, ~, ASD_gs] = runFits(data, M, mlFcn, isLinReg, 'ASD_gs');
+    [~, ~, ASD_gs_m] = runFits(data, M, mlFcn, isLinReg, 'ASD_gs_mother');
     
     data.D = D;
     data.hypergrid = hypergrid;
@@ -19,6 +23,9 @@ function updateFits(fname, data, M, mlFcn, isLinReg)
     data.ASD_gs.scores = ASD_gs.scores;
     data.ASD_gs.hyprs = ASD_gs.hyprs;
     data.ASD_gs.mus = ASD_gs.mus;
+    
+    data.ASD_m = ASD_m;
+    data.ASD_gs_m = ASD_gs_m;
     
     save(fname, '-struct', 'data');
 end
