@@ -15,39 +15,42 @@ function [D, hypergrid, obj] = runFits(data, M, mlFcn, isLinReg, fit)
         ns = 5*ones(1,3);
         scFcn = M.pseudoRsqFcn;
     end
+    mapFcns = struct('fitFcn', M.mapFcn, 'fitFcnOpts', {{}}, ...
+        'scoreFcn', scFcn, 'scoreFcnOpts', {{}});
+    mlFcns = struct('fitFcn', mlFcn, 'fitFcnOpts', {{}}, ...
+        'scoreFcn', scFcn, 'scoreFcnOpts', {{}});
 
     % test hypergrid
     hypergrid = exp(tools.gridCartesianProduct(lbs, ubs, ns));
+    hyperOpts = struct('lbs', lbs, 'ubs', ubs, 'ns', ns, 'isLog', isLog);
     trials = reg.trainAndTestKFolds(data.X, data.Y, nan, data.foldinds);
 
     % test ASD
     if strcmpi(fit, 'ASD')        
-        [scores, hyprs, mus] = reg.cvScoreGrid(trials, M.mapFcn, scFcn, ...
-            hypergrid, {}, {});
+        [scores, hyprs, mus] = reg.cvScoreGrid(trials, mapFcns, hypergrid);
         obj.scores = scores;
         obj.hyprs = hyprs;
         obj.mus = mus;
         
     elseif strcmpi(fit, 'ASD_mother')
-        obj = reg.cvMaxScoreGrid(data.X, data.Y, hypergrid, M.mapFcn, ...
-            {}, scFcn, {}, data.foldinds, data.evalinds);
+        obj = reg.cvMaxScoreGrid(data.X, data.Y, mapFcns, hypergrid, ...
+            data.foldinds, data.evalinds, 'grid');
 
     % test ML
     elseif strcmpi(fit, 'ML')
-        [scores, ~, mus] = reg.cvScoreGrid(trials, mlFcn, scFcn, ...
-            [nan nan nan], {}, {});
+        [scores, ~, mus] = reg.cvScoreGrid(trials, mlFcns, [nan nan nan]);
         obj.scores = scores;
         obj.mus = mus;
 
     % test ASD grid search parent
     elseif strcmpi(fit, 'ASD_gs_mother')
-        obj = reg.cvMaxScoreGridSearch(data.X, data.Y, lbs, ubs, ns, ...
-            M.mapFcn, {}, scFcn, {}, data.foldinds, data.evalinds, isLog);
+        obj = reg.cvMaxScoreGrid(data.X, data.Y, mapFcns, nan, ...
+            data.foldinds, data.evalinds, 'grid-search', hyperOpts);
 
     % test ASD grid search
     elseif strcmpi(fit, 'ASD_gs')
-        [scores, hyprs, mus] = reg.cvScoreGridSearch(trials, M.mapFcn, ...
-            scFcn, lbs, ubs, ns, {}, {}, isLog);
+        [scores, hyprs, mus] = reg.cvScoreGridSearch(trials, mapFcns, ...
+            hyperOpts);
         obj.scores = scores;
         obj.hyprs = hyprs;
         obj.mus = mus;

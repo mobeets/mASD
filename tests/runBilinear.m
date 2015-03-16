@@ -15,11 +15,14 @@ function mu = runBilinear(doReshape)
     opts.tol = 1e-5;
     opts.wt0 = ones(size(X,3),1);
     
+    fcns = struct('sFcn', sFcn, 'sFcnOpts', {sFcnOpts}, ...
+        'tFcn', tFcn, 'tFcnOpts', {tFcnOpts});
+    
     if doReshape
         X = reshape(X, ny, ns*nt);
         opts.shape = {ns, nt};
-        mu = reg.calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts);
+        mu = reg.calcBilinear(X, Y, fcns, opts);
     else
-        mu = reg.calcBilinear(X, Y, sFcn, sFcnOpts, tFcn, tFcnOpts, opts);
+        mu = reg.calcBilinear(X, Y, fcns, opts);
     end
 end

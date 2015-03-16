@@ -1,5 +1,4 @@
-function [scores, hypers, mus] = cvScoreGrid(trials, mapFcn, scoreFcn, ...
-    hypergrid, mapFcnOpts, scoreFcnOpts)
+function [scores, hypers, mus] = cvScoreGrid(trials, fcns, hypergrid)
 % function [scores, hypers, mus] = cvScoreGrid(trials, mapFcn, ...
 %   scoreFcn, hypergrid, map_opts, score_opts)
 % 
@@ -10,15 +9,16 @@ function [scores, hypers, mus] = cvScoreGrid(trials, mapFcn, scoreFcn, ...
 % trials.
 %   x_train, x_test [cells] - training and testing stimuli
 %   y_train, y_test [cells] - training and testing responses
-% mapFcn(X, Y, hyper, opts) [function handle]
-%   - returns MAP estimate of w for Y=Xw given a hyperparameter
-%   - also returns DC term, or offset
-%   - also returns hyper, if changed
-% scoreFcn(X, Y, w, hyper, opts) [function handle]
-%   - evaluates the test score (e.g. test likelihood) of w s.t. Y=Xw
+% fcns.
+%   fitFcn(X, Y, hyper, opts) [function handle]
+%       - returns MAP estimate of w for Y=Xw given a hyperparameter
+%       - also returns DC term, or offset
+%       - also returns hyper, if changed
+%   scoreFcn(X, Y, w, hyper, opts) [function handle]
+%       - evaluates the test score (e.g. test likelihood) of w s.t. Y=Xw
+%   fitFcnOpts [struct] - optional data passed to scoreFcn
+%   scoreFcnOpts [struct] - optional data passed to scoreFcn
 % hypergrid [matrix] - hyperparameters to score for each fold of cv
-% mapFcnOpts [struct] - optional data passed to scoreFcn
-% scoreFcnOpts [struct] - optional data passed to scoreFcn
 % 
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
@@ -38,11 +38,12 @@ function [scores, hypers, mus] = cvScoreGrid(trials, mapFcn, scoreFcn, ...
             end
             hyper0 = hypergrid(jj,:);
             [w, b, hyper] = reg.fitHypersAndWeights(ctrials.x_train, ...
-                ctrials.y_train, mapFcn(hyper0, mapFcnOpts{:}));
+                ctrials.y_train, fcns.fitFcn(hyper0, fcns.fitFcnOpts{:}));
             mu = [w; b];
             mus{jj, ii} = mu;
             hypers(jj, ii, :) = hyper; % may be unchanged from hyper0
-            scores(jj, ii) = scoreFcn(ctrials, mu, hyper, scoreFcnOpts{:});
+            scores(jj, ii) = fcns.scoreFcn(ctrials, mu, hyper, ...
+                fcns.scoreFcnOpts{:});
         end
     end
 end
