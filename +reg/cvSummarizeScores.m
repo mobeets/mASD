@@ -15,5 +15,5 @@ function obj = cvSummarizeScores(scores, hypergrid, mus)
     end
     obj.hyper = hyper;
     obj.scores = scs;
-    obj.scoreVarFolds = std(obj.scores); % std dev of scores across folds
+    obj.scoreStdvFolds = std(obj.scores); % std dev of scores across folds
 end
