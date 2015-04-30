@@ -28,7 +28,7 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts)
     obj.centerX = false;
 end
 
-function obj = linearFitHandle(hyper0, D, fitstr, llfcn, opts)
+function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
     if strcmpi(fitstr, 'evi')
         obj.hyperFcn = @asd.gauss.optMinNegLogEvi;
         obj.hyperFcnArgs = {D, hyper0, true, false};
@@ -37,12 +37,12 @@ function obj = linearFitHandle(hyper0, D, fitstr, llfcn, opts)
         obj.hyperFcnArgs = {hyper0};
     end
     if strcmpi(fitstr, 'bilinear')
-        fcns = @(hyper) struct('sFcn', llfcn, 'sFcnOpts', ...
+        fcns = @(hyper) struct('sFcn', mapFcn, 'sFcnOpts', ...
             {{hyper, D}}, 'tFcn', @ml.calcGaussML, 'tFcnOpts', {{}});
         obj.muFcn = @(X, Y, hyper, D) reg.calcBilinear(X, Y, ...
             fcns(hyper), opts);
     else
-        obj.muFcn = llfcn;
+        obj.muFcn = mapFcn;
     end
     obj.muFcnArgs = {D};
 end

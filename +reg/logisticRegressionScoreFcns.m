@@ -10,9 +10,10 @@ function obj = logisticRegressionScoreFcns()
 
     obj.pseudoRsqFcn = @(trials, w, hyper) ...
         tools.pseudoRsq(...
-            obj.llFcn0(trials.x_test, trials.y_test, w, hyper), ... % actual model
+            obj.llFcn(trials, w, hyper), ... % actual model
             0, ... % saturated model
-            obj.llFcn0(mean(trials.y_train)*ones(size(trials.y_test,1),1), ...
-                trials.y_test, 1, hyper)); % null model
+            obj.llFcn0(... % null model
+                mean(trials.y_train)*ones(size(trials.y_test,1),1), ...
+                    trials.y_test, 1, hyper));
 %             M.llFcn0(trials.y_test, trials.y_test, 1, hyper), ...  % saturated model
 end

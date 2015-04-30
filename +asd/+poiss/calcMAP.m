@@ -10,12 +10,12 @@ function wMAP = calcMAP(X, Y, hyper, D)
     mstruct.liargs = {XB, Y, @tools.expfun};
     mstruct.priargs = {RegInv};
     nlogpost = @(w) tools.neglogpost_GLM(w, hyper, mstruct);
-
+    
+    %     w0 = (XB'*XB)\(XB'*Y); % stupid starting point
+    w0 = zeros(size(B,2),1); % always seems better!
     objopts = optimset('display', 'off', 'gradobj', 'on', ...
             'largescale', 'off', 'algorithm', 'Active-Set');
-%     w0 = (XB'*XB)\(XB'*Y); % stupid starting point
-    w0 = zeros(size(B,2),1); % always seems better!
-    wMAP = fminunc(nlogpost, w0, objopts);
+    wMAP = fminunc(nlogpost, w0+0.5, objopts);
     wMAP = B*wMAP;
     
 end
