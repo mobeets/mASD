@@ -19,15 +19,16 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts)
     if strcmpi(llstr, 'bern')
         obj = logisticFitHandle(hyper0, D, fitstr, opts);
     elseif strcmpi(llstr, 'gauss')
-        obj = linearFitHandle(hyper0, D, fitstr, opts);
+        obj = linearFitHandle(hyper0, D, fitstr, @asd.gauss.calcMAP, opts);
     elseif strcmpi(llstr, 'poiss')
-        obj = linearFitHandle(hyper0, D, fitstr, opts);
+        assert(~strcmpi(fitstr, 'evi')); % not yet supported
+        obj = linearFitHandle(hyper0, D, fitstr, @asd.poiss.calcMAP, opts);
     end
     obj.fitIntercept = true;
     obj.centerX = false;
 end
 
-function obj = linearFitHandle(hyper0, D, fitstr, opts)
+function obj = linearFitHandle(hyper0, D, fitstr, llfcn, opts)
     if strcmpi(fitstr, 'evi')
         obj.hyperFcn = @asd.gauss.optMinNegLogEvi;
         obj.hyperFcnArgs = {D, hyper0, true, false};
@@ -36,12 +37,12 @@ function obj = linearFitHandle(hyper0, D, fitstr, opts)
         obj.hyperFcnArgs = {hyper0};
     end
     if strcmpi(fitstr, 'bilinear')
-        fcns = @(hyper) struct('sFcn', @asd.gauss.calcMAP, 'sFcnOpts', ...
+        fcns = @(hyper) struct('sFcn', llfcn, 'sFcnOpts', ...
             {{hyper, D}}, 'tFcn', @ml.calcGaussML, 'tFcnOpts', {{}});
         obj.muFcn = @(X, Y, hyper, D) reg.calcBilinear(X, Y, ...
             fcns(hyper), opts);
     else
-        obj.muFcn = @asd.gauss.calcMAP;
+        obj.muFcn = llfcn;
     end
     obj.muFcnArgs = {D};
 end

@@ -5,9 +5,9 @@ function wMAP = calcMAP(X, Y, hyper, D)
     [RegInv, B] = asd.invPrior(Reg);
     XB = X*B;
 
-    mstruct.neglogli = @tools.neglogli_bernoulliGLM;
+    mstruct.neglogli = @tools.neglogli_poissGLM;
     mstruct.logprior = @(w, ~, RegInv) tools.gaussLogPrior(w, 0, RegInv, true);
-    mstruct.liargs = {XB, Y};
+    mstruct.liargs = {XB, Y, @tools.expfun};
     mstruct.priargs = {RegInv};
     nlogpost = @(w) tools.neglogpost_GLM(w, hyper, mstruct);
 
