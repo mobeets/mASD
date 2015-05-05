@@ -15,7 +15,7 @@ function wMAP = calcMAP(X, Y, hyper, D)
     w0 = zeros(size(B,2),1); % always seems better!
     objopts = optimset('display', 'off', 'gradobj', 'on', ...
             'largescale', 'off', 'algorithm', 'Active-Set');
-    wMAP = fminunc(nlogpost, w0+0.5, objopts);
+    wMAP = fminunc(nlogpost, w0, objopts);
     wMAP = B*wMAP;
     
 end
