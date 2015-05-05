@@ -3,5 +3,5 @@ function wML = calcBernML(X, R, ~)
     objopts = optimset('display', 'off', 'gradobj', 'on', ...
             'largescale', 'off', 'algorithm', 'Active-Set');
     w0 = (X'*X)\(X'*R);
-    wML = fminunc(obj, w0, objopts);
+    wML = fminunc(obj, w0*0, objopts);
 end
