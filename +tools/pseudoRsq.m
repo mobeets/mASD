@@ -11,9 +11,6 @@ function val = pseudoRsq(ll, llSat, llNull)
     if llSat < ll
         x=1;
     end
-    if sign(llSat - ll)*sign(llSat - llNull) < 0
-        x=1;
-    end
     assert(llSat >= llNull);
     assert(llSat >= ll);
     val = 1 - ((llSat - ll)/(llSat - llNull));
