@@ -6,7 +6,11 @@ function [trials, trninds] = trainAndTest(X, Y, trainPct, inds)
 % 
     if nargin < 4
         ny = numel(Y);
-        [trninds, ~] = crossvalind('HoldOut', ones(ny, 1), 1-trainPct);
+        if trainPct == 0 || trainPct == 1 % illegal param for crossvalind
+            trninds = logical(trainPct*ones(ny,1));
+        else
+            [trninds, ~] = crossvalind('HoldOut', ones(ny, 1), 1-trainPct);
+        end
     else
         trninds = inds;
     end

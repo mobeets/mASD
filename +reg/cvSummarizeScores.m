@@ -14,6 +14,7 @@ function obj = cvSummarizeScores(scores, hypergrid, mus)
         obj.muCorrFolds = nan;
     end
     obj.hyper = hyper;
+    obj.score = mean(scs);
     obj.scores = scs;
-    obj.scoreStdvFolds = std(obj.scores); % std dev of scores across folds
+    obj.scoreStdvFolds = std(scs); % std dev of scores across folds
 end

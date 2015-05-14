@@ -2,7 +2,7 @@ function [D, hypergrid, obj] = runFits(data, MAP, ML, scoreFcn, ...
     isLinReg, fitType)
 
     % test distance matrix construction
-    D = asd.sqdist.spaceTime(data.Xxy, data.ns, data.nt);
+    D = asd.sqdist.spaceTime(data.Xxy, data.nt);
 
     isLog = true;
     if isLinReg

@@ -1,5 +1,6 @@
-function D = spaceTime(xy, ns, nt)
+function D = spaceTime(xy, nt)
 % make combined spatial/temporal squared distance matrix, D
+    ns = size(xy,1);
     Ds = repmat(asd.sqdist.space(xy), nt, nt);
     Dt = asd.sqdist.time(nt, ns);
     D = nan(ns*nt, ns*nt, 2);

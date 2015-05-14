@@ -1,4 +1,4 @@
-function obj = fitHandle(hyper0, D, llstr, fitstr, opts)
+function obj = fitHandle(hyper0, D, llstr, fitstr, opts, fitOpts)
 % 
 % Inputs:
 %     hyper0 - hyperparameter to give to hyperFcn for optimization
@@ -8,8 +8,13 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts)
 %       '' - (default)
 %       'evi' - evidence optimization to choose hyperparameter
 %       'bilinear' - assumes space and time are separable when fitting kernel
-%     opts - for llstr 'bilinear'
+%     opts - for llstr 'bilinear' or fitstr 'evi'
 % 
+    if nargin < 6        
+        fitOpts = struct();
+    end
+    fitOpts = updateOptsWithDefaults(fitOpts, ...
+        {'fitIntercept', 'centerX'}, {true, false});
     if nargin < 5
         opts = struct();
     end
@@ -24,14 +29,18 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts)
         assert(~strcmpi(fitstr, 'evi')); % not yet supported
         obj = linearFitHandle(hyper0, D, fitstr, @asd.poiss.calcMAP, opts);
     end
-    obj.fitIntercept = true;
-    obj.centerX = false;
+    obj.fitIntercept = fitOpts.fitIntercept;
+    obj.centerX = fitOpts.centerX;
 end
 
 function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
     if strcmpi(fitstr, 'evi')
         obj.hyperFcn = @asd.gauss.optMinNegLogEvi;
-        obj.hyperFcnArgs = {D, hyper0, true, false};
+        opts = updateOptsWithDefaults(opts, ...
+            {'isLog', 'jac', 'fullTemporalSmoothing'}, ...
+            {true, true, false});
+        obj.hyperFcnArgs = {D, hyper0, ...
+            opts.isLog, opts.jac, opts.fullTemporalSmoothing};
     else
         obj.hyperFcn = @(X, Y, hyper) hyper;
         obj.hyperFcnArgs = {hyper0};
@@ -64,4 +73,12 @@ function fcnopts = logisticFitHandle(hyper0, D, fitstr, opts)
         fcnopts.muFcn = @asd.bern.calcMAP;
     end
     fcnopts.muFcnArgs = {D};
+end
+
+function opts = updateOptsWithDefaults(opts, names, vals)
+    for ii = 1:numel(names)
+        if ~isfield(opts, names{ii})
+            opts.(names{ii}) = vals{ii};
+        end
+    end
 end
