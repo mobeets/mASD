@@ -1,4 +1,5 @@
-function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, noDeltaT)
+function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, ...
+    noDeltaT, nRepeats)
 % 
 % X - (p x q) matrix with inputs in rows
 % Y - (p, 1) matrix with measurements
@@ -12,6 +13,9 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, noDeltaT)
 % 
     LOWER_BOUND_DELTA_TEMPORAL = 0.12;
     ndeltas = size(Ds, 3);
+    if nargin < 8
+        nRepeats = 5;
+    end
     if nargin < 7 || isnan(noDeltaT)
         noDeltaT = false;
     end
@@ -29,15 +33,8 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, noDeltaT)
         ubs = [20, 10e6, 1e5*ones(1,ndeltas)];
     end
     if nargin < 4 || any(isnan(theta0))
-        theta0 = nan(numel(lbs),1);
-        for ii = 1:numel(lbs)
-            theta0(ii) = lbs(ii) + (ubs(ii)-lbs(ii))*rand;
-        end
-%         theta0 = [1.0, 0.15, 2.0*ones(1,ndeltas)];
+        theta0 = pickRandomTheta0(lbs, ubs);
     end
-%     if isLog
-%         theta0 = log(theta0);
-%     end
     if jac
         jacStr = 'on';
     else
@@ -58,7 +55,16 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, noDeltaT)
 %     opts = optimset('display', 'iter', 'gradobj', jacStr, ...
 %         'largescale', 'off', 'algorithm', 'Active-Set');
     obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog);
-    hyper = fmincon(obj, theta0, [], [], [], [], lbs, ubs, [], opts);
+    [hyper, fval] = fmincon(obj, theta0, ...
+        [], [], [], [], lbs, ubs, [], opts);
+    for ii = 1:nRepeats
+        theta0 = pickRandomTheta0(lbs, ubs);
+        [hyper0, fval0] = fmincon(obj, theta0, ...
+            [], [], [], [], lbs, ubs, [], opts);
+        if fval0 < fval
+            hyper = hyper0;
+        end
+    end
     if isLog
         hyper = exp(hyper);
     end
@@ -90,3 +96,11 @@ function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog
         nderlogevi = -[der_ro, der_ssq, der_deltas];
     end
 end
+
+function theta0 = pickRandomTheta0(lbs, ubs)
+    theta0 = nan(numel(lbs),1);
+    for ii = 1:numel(lbs)
+        theta0(ii) = lbs(ii) + (ubs(ii)-lbs(ii))*rand;
+    end
+end
+
