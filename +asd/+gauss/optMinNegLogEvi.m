@@ -1,5 +1,4 @@
-function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, ...
-    noDeltaT, nRepeats)
+function hyper = optMinNegLogEvi(X, Y, Ds, theta0, jac, noDeltaT, nRepeats)
 % 
 % X - (p x q) matrix with inputs in rows
 % Y - (p, 1) matrix with measurements
@@ -11,26 +10,18 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, ...
 %     In S. Becker, S. Thrun, and K. Obermayer, eds.
 %     Advances in Neural Information Processing Systems, vol. 15, pp. 301-308, Cambridge, MA, 2003
 % 
-    LOWER_BOUND_DELTA_TEMPORAL = 0.12;
     ndeltas = size(Ds, 3);
-    if nargin < 8
+    lbs = [-10, -5, -1*ones(1,ndeltas)];
+    ubs = [10, 6, 6*ones(1,ndeltas)];
+    
+    if nargin < 7
         nRepeats = 5;
     end
-    if nargin < 7 || isnan(noDeltaT)
+    if nargin < 6 || isnan(noDeltaT)
         noDeltaT = false;
     end
-    if nargin < 6 || isnan(jac)
+    if nargin < 5 || isnan(jac)
         jac = false;
-    end
-    if nargin < 5 || isnan(isLog)
-        isLog = true;
-    end
-    if isLog
-        lbs = [-3, -2, -1*ones(1,ndeltas)];
-        ubs = [3, 10, 6*ones(1,ndeltas)];        
-    else
-        lbs = [-20, 10e-6, LOWER_BOUND_DELTA_TEMPORAL*ones(1,ndeltas)];
-        ubs = [20, 10e6, 1e5*ones(1,ndeltas)];
     end
     if nargin < 4 || any(isnan(theta0))
         theta0 = pickRandomTheta0(lbs, ubs);
@@ -54,7 +45,7 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, ...
         'largescale', 'off', 'algorithm', 'interior-point');
 %     opts = optimset('display', 'iter', 'gradobj', jacStr, ...
 %         'largescale', 'off', 'algorithm', 'Active-Set');
-    obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog);
+    obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q);
     [hyper, fval] = fmincon(obj, theta0, ...
         [], [], [], [], lbs, ubs, [], opts);
     for ii = 1:nRepeats
@@ -65,16 +56,13 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, isLog, jac, ...
             hyper = hyper0;
         end
     end
-    if isLog
-        hyper = exp(hyper);
-    end
+    hyper(2:end) = exp(hyper(2:end));
 end
 
-function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
-    if isLog
-        old_hyper = hyper;
-        hyper = exp(hyper);
-    end
+function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q)
+    old_hyper = hyper;
+    hyper(2:end) = exp(hyper(2:end));
+
     [ro, ssq, deltas] = asd.unpackHyper(hyper);
     Reg = asd.prior(ro, Ds, deltas);
     [logEvi, sigmaInv, B, isNewBasis] = asd.gauss.logEvidence(X, Y, XX, ...
