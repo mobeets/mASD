@@ -37,7 +37,7 @@ function obj = cvMaxScoreGrid(X, Y, fitFcn, scoreFcn, hypers, foldinds, ...
     end
     
     % evaluate hyperparameter on evaluation set, and score
-    obj = reg.cvSummarizeScores(scores, hypers, mus);
+    obj = reg.cvPickBestHyper(scores, hypers, mus);
     obj = reg.cvFitAndEvaluateHyperparam(obj, evaltrials, ...
         fitFcn, scoreFcn);
 end

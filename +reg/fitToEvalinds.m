@@ -8,8 +8,7 @@ function obj = fitToEvalinds(X, Y, evalinds, fitFcn, scoreFcn, hyper)
 % 
     % split X, Y into development/evaluation sets    
     evaltrials = reg.trainAndTest(X, Y, nan, evalinds);
-    obj.hyper = hyper;
-    obj.scores = [];
+    obj.hyper = hyper'; obj.scores = [];
     obj = reg.cvFitAndEvaluateHyperparam(obj, evaltrials, ...
         fitFcn, scoreFcn);
 end

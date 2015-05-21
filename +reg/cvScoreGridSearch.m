@@ -23,7 +23,7 @@ function [scores, hypers, mus] = cvScoreGridSearch(trials, fitFcn, ...
 % returns matrix of scores for each fold for each hyperparameter
 %   also returns matrix of hypers corresponding to scores
 % 
-    h = @(x) hyperOpts.isLog*exp(x) + (1-hyperOpts.isLog)*x;
+    h = @(x) hyperOpts.isLog.*exp(x) + (1-hyperOpts.isLog).*x;
     getScore = @(hyper) totalScore(hyper, trials, fitFcn, scoreFcn, h);
     [~, ~, hypers, scores] = reg.gridSearch(getScore, ...
         hyperOpts.lbs, hyperOpts.ubs, hyperOpts.ns);

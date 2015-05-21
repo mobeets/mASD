@@ -1,4 +1,4 @@
-function obj = cvSummarizeScores(scores, hypergrid, mus)
+function obj = cvPickBestHyper(scores, hypergrid, mus)
     nfolds = size(scores, 2); % average across folds
     mean_scores = mean(scores, 2);
     [~, idx] = max(mean_scores); % choose hyper with highest mean score
@@ -13,8 +13,6 @@ function obj = cvSummarizeScores(scores, hypergrid, mus)
         obj.mus = nan;
         obj.muCorrFolds = nan;
     end
-    obj.hyper = hyper;
-    obj.score = mean(scs);
+    obj.hyper = hyper;    
     obj.scores = scs;
-    obj.scoreStdvFolds = std(scs); % std dev of scores across folds
 end
