@@ -1,4 +1,4 @@
-function hyper = optMinNegLogEvi(X, Y, Ds, theta0, jac, noDeltaT, nRepeats)
+function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
 % 
 % X - (p x q) matrix with inputs in rows
 % Y - (p, 1) matrix with measurements
@@ -9,10 +9,14 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, jac, noDeltaT, nRepeats)
 %     Evidence optimization techniques for estimating stimulus-response functions.
 %     In S. Becker, S. Thrun, and K. Obermayer, eds.
 %     Advances in Neural Information Processing Systems, vol. 15, pp. 301-308, Cambridge, MA, 2003
-% 
+%     
+    isLog = true;
     ndeltas = size(Ds, 3);
-    lbs = [-10, -5, -1*ones(1,ndeltas)];
-    ubs = [10, 6, 6*ones(1,ndeltas)];
+    lbs = [-20, -10, -1*ones(1,ndeltas)];
+    ubs = [20, 6, 6*ones(1,ndeltas)];
+    if ~isLog
+        lbs(2:end) = exp(lbs(2:end)); ubs(2:end) = exp(ubs(2:end));
+    end
     
     if nargin < 7
         nRepeats = 5;
@@ -20,18 +24,19 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, jac, noDeltaT, nRepeats)
     if nargin < 6 || isnan(noDeltaT)
         noDeltaT = false;
     end
-    if nargin < 5 || isnan(jac)
-        jac = false;
+    if nargin < 5 || isnan(gradObj)
+        gradObj = false;
     end
-    if nargin < 4 || any(isnan(theta0))
-        theta0 = pickRandomTheta0(lbs, ubs);
+    if nargin < 4 || any(isnan(theta0))        
+        theta0 = pickRandomTheta0(lbs, ubs, isLog);
     end
-    if jac
-        jacStr = 'on';
+    if gradObj
+        gradStr = 'on';
     else
-        jacStr = 'off';
+        gradStr = 'off';
     end
     [p, q] = size(X);
+    
     YY = Y'*Y;
     XY = X'*Y;
     XX = X'*X;
@@ -41,27 +46,42 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, jac, noDeltaT, nRepeats)
     end
 
     % minimize objfcn, with bounds lbs, ubs; starts at theta0
-    opts = optimset('display', 'off', 'gradobj', jacStr, ...
-        'largescale', 'off', 'algorithm', 'interior-point');
-%     opts = optimset('display', 'iter', 'gradobj', jacStr, ...
-%         'largescale', 'off', 'algorithm', 'Active-Set');
-    obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q);
+    opts = optimset('display', 'off', 'gradobj', gradStr, ...
+        'largescale', 'off', 'algorithm', 'sqp', 'MaxFunEvals', 1e3, ...        
+        'AlwaysHonorConstraints', 'none'); % interior-point, 'Active-Set'
+%     'DerivativeCheck', 'on', ...
+
+    obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog);
     [hyper, fval] = fmincon(obj, theta0, ...
         [], [], [], [], lbs, ubs, [], opts);
+    
+    hyper0s = nan(nRepeats+1,2+ndeltas);
+    theta0s = nan(nRepeats+1,2+ndeltas);
+    fvals = nan(nRepeats+1,1);
+    hyper0s(1,:) = hyper;
+    theta0s(1,:) = theta0;
+    fvals(1) = fval;
     for ii = 1:nRepeats
-        theta0 = pickRandomTheta0(lbs, ubs);
+        theta0 = pickRandomTheta0(lbs, ubs, isLog);        
         [hyper0, fval0] = fmincon(obj, theta0, ...
             [], [], [], [], lbs, ubs, [], opts);
+        theta0s(ii+1,:) = theta0;
+        fvals(ii+1) = fval0;
+        hyper0s(ii+1,:) = hyper0;
         if fval0 < fval
             hyper = hyper0;
+            fval = fval0;
         end
     end
-    hyper(2:end) = exp(hyper(2:end));
+    if isLog
+        hyper(2:end) = exp(hyper(2:end));
+    end
 end
 
-function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q)
-    old_hyper = hyper;
-    hyper(2:end) = exp(hyper(2:end));
+function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
+    if isLog
+        hyper(2:end) = exp(hyper(2:end));
+    end
 
     [ro, ssq, deltas] = asd.unpackHyper(hyper);
     Reg = asd.prior(ro, Ds, deltas);
@@ -77,18 +97,27 @@ function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q)
             mu = B*mu;
             sigmaInv = B*sigmaInv*B';
         end
-        sse =  tools.sse(Y, X, mu);
+        sse = tools.sse(Y, X, mu);
         Sigma = sigmaInv \ eye(q);
         [der_ro, der_ssq, der_deltas] = asd.gauss.logEvidenceGradient(...
             hyper, p, q, Ds, mu, Sigma, Reg, sse);
-        nderlogevi = -[der_ro, der_ssq, der_deltas];
+        derlogevi = [der_ro, der_ssq, der_deltas];
+        nderlogevi = -derlogevi;
+        if isLog
+            nderlogevi(2:end) = -log(derlogevi(2:end));
+        end
     end
 end
 
-function theta0 = pickRandomTheta0(lbs, ubs)
+function theta0 = pickRandomTheta0(lbs, ubs, isLog)
+    if ~isLog
+        lbs(2:end) = log(lbs(2:end)); ubs(2:end) = log(ubs(2:end));
+    end
     theta0 = nan(numel(lbs),1);
     for ii = 1:numel(lbs)
         theta0(ii) = lbs(ii) + (ubs(ii)-lbs(ii))*rand;
     end
+    if ~isLog
+        theta0(2:end) = exp(theta0(2:end));
+    end
 end
-

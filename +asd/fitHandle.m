@@ -37,10 +37,10 @@ function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
     if strcmpi(fitstr, 'evi')
         obj.hyperFcn = @asd.gauss.optMinNegLogEvi;
         opts = updateOptsWithDefaults(opts, ...
-            {'jac', 'fullTemporalSmoothing'}, ...
-            {true, true, false});
+            {'gradObj', 'fullTemporalSmoothing'}, ...
+            {false, false});
         obj.hyperFcnArgs = {D, hyper0, ...
-            opts.jac, opts.fullTemporalSmoothing};
+            opts.gradObj, opts.fullTemporalSmoothing};
     else
         obj.hyperFcn = @(X, Y, hyper) hyper;
         obj.hyperFcnArgs = {hyper0};
