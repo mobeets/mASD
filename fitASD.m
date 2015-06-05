@@ -70,6 +70,7 @@ function obj = loadDefaults(X, Y, ~, obj)
     end
     if ~isfield(obj, 'hyperObj')
         if strcmp(obj.llstr, 'gauss')
+            hyperObj.name = 'evidence';
             hyperObj.fitFcn = @asd.gauss.optMinNegLogEvi;
             hyperObj.opts = tools.updateOptsWithDefaults(hyperObj.opts, ...
                 {'gradObj', 'fullTemporalSmoothing'}, ...
@@ -77,8 +78,18 @@ function obj = loadDefaults(X, Y, ~, obj)
             hyperObj.fitFcnArgs = {hyperObj.opts.hyper0, ...
                 hyperObj.opts.gradObj, hyperObj.opts.fullTemporalSmoothing};            
         else
-%           grid!
-            return;
+            hyperObj.name = 'grid';
+            lbs = [-10 -1 -1]; ubs = [10 6 6]; ns = 7*ones(1,3);
+            hypergrid = tools.gridCartesianProduct(lbs, ubs, ns);
+            isLog = [false true true];
+            isLog = repmat(isLog, size(hypergrid,1), 1);
+            hypers = isLog.*(exp(hypergrid)) + (1-isLog).*hypergrid;
+%             hyperObj.fitFcn = @reg.cvScoreGrid;
+%           1. turn the actual fitting above into its own function
+%           2. make a function that calls that for each hyper in a grid
+%           3. wrap that function in a thing choosing the best hyper
+%           fitFcn needs to fit all to
+            hyperObj.fitFcnArgs = {hypers};
         end
         obj.hyperObj = hyperObj;
     end
