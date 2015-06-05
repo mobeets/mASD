@@ -1,15 +1,18 @@
-function opts = fitHandle(llstr)    
-    opts.hyperFcn = @(X, Y, hyper) hyper;
-    opts.hyperFcnArgs = {nan};
-    opts.fitIntercept = true;
+function obj = fitHandle(llstr)    
+    obj.hyperFcn = @(X, Y, hyper) hyper;
+    obj.hyperFcnArgs = {nan};
+    obj.fitIntercept = true;
     if strcmp(llstr, 'gauss')
-        opts.muFcn = @ml.calcGaussML;
+        obj.muFcn = @ml.calcGaussML;
+        obj.predictionFcn = @(X, w) X*w;
     elseif strcmp(llstr, 'bern')
-        opts.muFcn = @ml.calcBernML;
-        opts.fitIntercept = false; % only fitting 0/1
+        obj.muFcn = @ml.calcBernML;
+        obj.predictionFcn = @(X, w) tools.logistic(X*w);
+%         opts.fitIntercept = false; % only fitting 0/1
     elseif strcmp(llstr, 'poiss')
-        opts.muFcn = @ml.calcPoissML;
+        obj.muFcn = @ml.calcPoissML;
+        obj.predictionFcn = @(X, w) X*w;
     end
-    opts.muFcnArgs = {};    
-    opts.centerX = false;
+    obj.muFcnArgs = {};    
+    obj.centerX = false;
 end

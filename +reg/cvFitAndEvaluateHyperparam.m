@@ -4,8 +4,8 @@ function obj = cvFitAndEvaluateHyperparam(obj, trials, fitFcn, scoreFcn)
         trials.y_train, fitFcn(obj.hyper));
     obj.mu = [w; b];
     obj.hyper = hyper;
-
-    ts.x_test = trials.x_train; ts.y_test = trials.y_train;
+    
+    ts = trials; ts.x_test = ts.x_train; ts.y_test = ts.y_train;
     obj.score_dev = scoreFcn(ts, obj.mu, obj.hyper);
     obj.score_eval = scoreFcn(trials, obj.mu, obj.hyper);
     obj.score_cvMean = mean(obj.scores);

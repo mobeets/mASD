@@ -1,4 +1,4 @@
-function fcn = scoreFcns(scorestr, llstr)
+function [fcn, obj] = scoreFcns(scorestr, llstr)
     if strcmpi(llstr, 'bern')
         obj = reg.logisticRegressionScoreFcns();
     else

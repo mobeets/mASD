@@ -14,5 +14,6 @@ function [mu, b, hyper] = fitHypersAndWeights(X, Y, opts)
         opts.fitIntercept, opts.centerX);
     hyper = opts.hyperFcn(X, Y, opts.hyperFcnArgs{:});
     mu = opts.muFcn(X, Y, hyper, opts.muFcnArgs{:});
-    b = reg.setIntercept(X_mean, Y_mean, mu, opts.fitIntercept);
+    b = reg.setIntercept(X_mean, Y_mean, mu, opts.fitIntercept, ...
+        opts.predictionFcn);
 end

@@ -23,11 +23,14 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts, fitOpts)
     end
     if strcmpi(llstr, 'bern')
         obj = logisticFitHandle(hyper0, D, fitstr, opts);
+        obj.predictionFcn = @(X, w) tools.logistic(X*w);
     elseif strcmpi(llstr, 'gauss')
         obj = linearFitHandle(hyper0, D, fitstr, @asd.gauss.calcMAP, opts);
+        obj.predictionFcn = @(X, w) X*w;
     elseif strcmpi(llstr, 'poiss')
         assert(~strcmpi(fitstr, 'evi')); % not yet supported
         obj = linearFitHandle(hyper0, D, fitstr, @asd.poiss.calcMAP, opts);
+        obj.predictionFcn = @(X, w) X*w;
     end
     obj.fitIntercept = fitOpts.fitIntercept;
     obj.centerX = fitOpts.centerX;
@@ -52,7 +55,7 @@ function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
             fcns(hyper), opts);
     else
         obj.muFcn = mapFcn;
-    end
+    end    
     obj.muFcnArgs = {D};
 end
 

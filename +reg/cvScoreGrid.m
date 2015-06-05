@@ -28,7 +28,7 @@ function [scores, hypers, mus] = cvScoreGrid(trials, fitFcn, scoreFcn, ...
     hypers = nan(nhypers, nfolds, nhyperdims);
     mus = cell(nhypers, nfolds);
     for ii = 1:nfolds
-        disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);
+%         disp(['FOLD #' num2str(ii) ' of ' num2str(nfolds)]);
         ctrials = trials(ii);
         for jj = 1:nhypers
             if mod(jj, round(nhypers/5)) == 0
