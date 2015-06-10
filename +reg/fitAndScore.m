@@ -36,11 +36,11 @@ function obj = fitAndScore(X, Y, obj, scoreObj)
     end
 
     % fit weights
-    [obj.mu, obj.b] = reg2.fitWeights(X, Y, obj);
+    [obj.mu, obj.b] = reg.fitWeights(X, Y, obj);
     obj.w = [obj.mu; obj.b];
 
     % score
-    [scores, ws, scoreDev] = reg2.cvFitScores(X, Y, obj, scoreObj);
+    [scores, ws, scoreDev] = reg.cvFitScores(X, Y, obj, scoreObj);
     obj.w_cv = ws;
     obj.scores = scores';
     obj.score_dev = scoreDev;

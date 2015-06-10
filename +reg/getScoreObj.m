@@ -1,5 +1,5 @@
 function scoreObj = getScoreObj(name, isLinReg)
-    predictionFcn = reg2.getPredictionFcn(isLinReg);
+    predictionFcn = reg.getPredictionFcn(isLinReg);
     rssFcn = @(X, Y, w,~) tools.rss(predictionFcn(X, w), Y);
     tssFcn = @(X, Y, w, ts) tools.rss(mean(ts.y_train)*ones(size(Y,1),1), Y);
     rsqFcn = @(X, Y, w,~) tools.rsq(predictionFcn(X, w), Y);

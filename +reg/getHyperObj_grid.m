@@ -13,7 +13,7 @@ function hyperObj = getHyperObj_grid(X, Y, obj, scoreObj)
 %     [~, foldinds] = reg.trainAndTestKFolds(X, Y, nfolds);
     foldinds = obj.foldinds;
 
-    hyperObj.fitFcn = @reg2.cvBestHyperGridScore;
+    hyperObj.fitFcn = @reg.cvBestHyperGridScore;
     hyperObj.fitFcnArgs = {foldinds, hypergrid, obj, scoreObj};
 
     hyperObj.opts.nfolds = nfolds;

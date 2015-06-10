@@ -8,7 +8,7 @@ function obj = getObj(X, Y, obj)
         if numel(unique(Y)) == 2
             obj.llstr = 'bern';
             obj.isLinReg = false;
-%             obj.fitIntercept = false;
+            obj.fitIntercept = false;
         else
             obj.llstr = 'gauss';
             obj.isLinReg = true;
@@ -16,7 +16,7 @@ function obj = getObj(X, Y, obj)
     end
     if ~isfield(obj, 'foldinds')
         obj.nfolds = 5;
-        [~, foldinds] = reg.trainAndTestKFolds(X, Y, obj.nfolds);
+        [~, foldinds] = tools.trainAndTestKFolds(X, Y, obj.nfolds);
         obj.foldinds = foldinds;
     end    
 end
