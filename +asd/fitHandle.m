@@ -1,4 +1,4 @@
-function obj = fitHandle(hyper0, D, llstr, fitstr, opts, fitOpts)
+function obj = fitHandle(hyper0, D, llstr, fitstr, opts, obj)
 % 
 % Inputs:
 %     hyper0 - hyperparameter to give to hyperFcn for optimization
@@ -11,10 +11,8 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts, fitOpts)
 %     opts - for llstr 'bilinear' or fitstr 'evi'
 % 
     if nargin < 6        
-        fitOpts = struct();
-    end
-    fitOpts = updateOptsWithDefaults(fitOpts, ...
-        {'fitIntercept', 'centerX'}, {true, false});
+        obj = struct();
+    end    
     if nargin < 5
         opts = struct();
     end
@@ -24,6 +22,7 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts, fitOpts)
     if strcmpi(llstr, 'bern')
         obj = logisticFitHandle(hyper0, D, fitstr, opts);
         obj.predictionFcn = @(X, w) tools.logistic(X*w);
+        obj.fitIntercept = false;
     elseif strcmpi(llstr, 'gauss')
         obj = linearFitHandle(hyper0, D, fitstr, @asd.gauss.calcMAP, opts);
         obj.predictionFcn = @(X, w) X*w;
@@ -32,8 +31,8 @@ function obj = fitHandle(hyper0, D, llstr, fitstr, opts, fitOpts)
         obj = linearFitHandle(hyper0, D, fitstr, @asd.poiss.calcMAP, opts);
         obj.predictionFcn = @(X, w) X*w;
     end
-    obj.fitIntercept = fitOpts.fitIntercept;
-    obj.centerX = fitOpts.centerX;
+    obj = updateOptsWithDefaults(obj, ...
+        {'fitIntercept', 'centerX'}, {true, false});
 end
 
 function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
@@ -56,7 +55,7 @@ function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
     else
         obj.muFcn = mapFcn;
     end    
-    obj.muFcnArgs = {hyper0, D};
+    obj.muFcnArgs = {D};
 end
 
 function fcnopts = logisticFitHandle(hyper0, D, fitstr, opts)
@@ -75,7 +74,7 @@ function fcnopts = logisticFitHandle(hyper0, D, fitstr, opts)
     else
         fcnopts.muFcn = @asd.bern.calcMAP;
     end
-    fcnopts.muFcnArgs = {hyper0, D};
+    fcnopts.muFcnArgs = {D};
 end
 
 function opts = updateOptsWithDefaults(opts, names, vals)
