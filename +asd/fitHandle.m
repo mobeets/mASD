@@ -56,7 +56,8 @@ function obj = linearFitHandle(hyper0, D, fitstr, mapFcn, opts)
     else
         obj.muFcn = mapFcn;
     end    
-    obj.muFcnArgs = {hyper0, D};
+    obj.muFcnArgs = {D};
+    % obj.muFcnArgs = {hyper0, D};
 end
 
 function fcnopts = logisticFitHandle(hyper0, D, fitstr, opts)
@@ -75,7 +76,8 @@ function fcnopts = logisticFitHandle(hyper0, D, fitstr, opts)
     else
         fcnopts.muFcn = @asd.bern.calcMAP;
     end
-    fcnopts.muFcnArgs = {hyper0, D};
+%     fcnopts.muFcnArgs = {hyper0, D};
+    fcnopts.muFcnArgs = {D};
 end
 
 function opts = updateOptsWithDefaults(opts, names, vals)

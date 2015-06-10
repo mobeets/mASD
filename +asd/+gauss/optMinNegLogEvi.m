@@ -27,8 +27,10 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
     if nargin < 5 || isnan(gradObj)
         gradObj = false;
     end
-    if nargin < 4 || any(isnan(theta0))        
+    if nargin < 4 || any(isnan(theta0))
         theta0 = pickRandomTheta0(lbs, ubs, isLog);
+%         theta0 = [1.1529  160.2757    1.0093    1.0048];
+%         theta0(2:end) = log(theta0(2:end))
     end
     if gradObj
         gradStr = 'on';
@@ -64,7 +66,7 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
     for ii = 1:nRepeats
         theta0 = pickRandomTheta0(lbs, ubs, isLog);        
         [hyper0, fval0] = fmincon(obj, theta0, ...
-            [], [], [], [], lbs, ubs, [], opts);
+            [], [], [], [], lbs, ubs, [], opts);        
         theta0s(ii+1,:) = theta0;
         fvals(ii+1) = fval0;
         hyper0s(ii+1,:) = hyper0;
@@ -76,6 +78,7 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
     if isLog
         hyper(2:end) = exp(hyper(2:end));
     end
+    hyper = hyper';
 end
 
 function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
