@@ -1,11 +1,12 @@
 function obj = getObj_ASD(X, Y, D, scoreObj, obj)
-    if nargin < 4
+    if nargin < 4 || (isa(scoreObj, 'double') && isnan(scoreObj))
         scoreObj = struct();
     end
     if nargin < 5
         obj = struct();
     end
     obj = reg.getObj(X, Y, obj);
+    obj.fitType = 'ASD';
 
     if strcmpi(obj.llstr, 'bern')
         obj.fitFcn = @asd.bern.calcMAP;

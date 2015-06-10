@@ -3,6 +3,7 @@ function obj = getObj_ML(X, Y, obj)
         obj = struct();
     end
     obj = reg.getObj(X, Y, obj);
+    obj.fitType = 'ML';
 
     if strcmp(obj.llstr, 'gauss')
         obj.fitFcn = @ml.calcGaussML;

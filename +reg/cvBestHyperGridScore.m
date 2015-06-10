@@ -4,8 +4,8 @@ function [mxHyper, mxScore, scores] = cvBestHyperGridScore(X, Y, ...
     trials = tools.trainAndTestKFolds(X, Y, nan, foldinds);
     nfolds = numel(trials);    
     nhypers = size(hypergrid, 1);
-    scores = nan(nfolds, nhypers);
-    ws = cell(nfolds, nhypers);
+    scores = nan(nhypers, nfolds);
+    ws = cell(nhypers, nfolds);
 
     for ii = 1:nfolds
         ctrials = trials(ii);
@@ -13,9 +13,9 @@ function [mxHyper, mxScore, scores] = cvBestHyperGridScore(X, Y, ...
             obj.hyper = hypergrid(jj,:);
             [mu, b] = reg.fitWeights(ctrials.x_train, ctrials.y_train, ...
                 obj);
-            ws{ii,jj} = [mu; b];
-            scores(ii,jj) = scoreObj.scoreFcn(ctrials.x_test, ...
-                ctrials.y_test, ws{ii,jj}, ctrials, ...
+            ws{jj,ii} = [mu; b];
+            scores(jj,ii) = scoreObj.scoreFcn(ctrials.x_test, ...
+                ctrials.y_test, ws{jj,ii}, ctrials, ...
                 scoreObj.scoreFcnArgs{:});
         end
     end
