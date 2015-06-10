@@ -18,5 +18,5 @@ function obj = getObj(X, Y, obj)
         obj.nfolds = 5;
         [~, foldinds] = tools.trainAndTestKFolds(X, Y, obj.nfolds);
         obj.foldinds = foldinds;
-    end    
+    end
 end
