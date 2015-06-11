@@ -1,4 +1,4 @@
-function hyperObj = getHyperObj_grid(X, Y, obj, scoreObj)
+function hyperObj = getHyperObj_grid(X, Y, obj)
     hyperObj.name = 'grid';
     
     % define grid
@@ -13,10 +13,10 @@ function hyperObj = getHyperObj_grid(X, Y, obj, scoreObj)
 %     [~, foldinds] = reg.trainAndTestKFolds(X, Y, nfolds);
     foldinds = obj.foldinds;
 
-    hyperObj.fitFcn = @reg.cvBestHyperGridScore;
-    hyperObj.fitFcnArgs = {foldinds, hypergrid, obj, scoreObj};
+    hyperObj.fitFcn = @reg.cvHyperFitScores;
+%     hyperObj.fitFcnArgs = {foldinds, hypergrid, obj, scoreObj};
 
-    hyperObj.opts.nfolds = nfolds;
-    hyperObj.opts.foldinds = foldinds;
-    hyperObj.opts.hypergrid = hypergrid;
+    hyperObj.nfolds = nfolds;
+    hyperObj.foldinds = foldinds;
+    hyperObj.hypergrid = hypergrid;
 end

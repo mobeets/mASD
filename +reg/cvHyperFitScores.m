@@ -1,7 +1,7 @@
-function [mxHyper, mxScore, scores] = cvBestHyperGridScore(X, Y, ...
-    foldinds, hypergrid, obj, scoreObj)
+function [mxHyper, mxScore, scores] = cvHyperFitScores(X, Y, obj, scoreObj)
 
-    trials = tools.trainAndTestKFolds(X, Y, nan, foldinds);
+    hypergrid = obj.hyperObj.hypergrid;
+    trials = tools.trainAndTestKFolds(X, Y, nan, obj.hyperObj.foldinds);
     nfolds = numel(trials);    
     nhypers = size(hypergrid, 1);
     scores = nan(nhypers, nfolds);

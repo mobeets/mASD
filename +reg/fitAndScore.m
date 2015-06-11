@@ -13,10 +13,15 @@ function obj = fitAndScore(X, Y, obj, scoreObj)
 %     .scoreFcn() = @(X, Y, w, obj.scoreObj.scoreFcnArgs{:})
 %     .scoreFcnArgs = {...};
 % 
-% Example:
-%     obj = reg2.loadDefaults_ASD(X, Y, D, obj);
-%     scoreObj = reg2.loadDefaultScoreObj('rsq', obj.isLinReg);
-%     obj = reg2.fitAndScore(X, Y, obj, scoreObj);
+% Example (ASD linear regression):
+%     scoreObj = reg.getScoreObj('rsq', true);
+%     obj = reg.getObj_ASD(X, Y, D);
+%     obj = reg.fitAndScore(X, Y, obj, scoreObj);
+% 
+% Example (ASD logistic regression):
+%     scoreObj = reg.getScoreObj('pctCorrect', false);
+%     obj = reg.getObj_ASD(X, Y, D, scoreObj);
+%     obj = reg.fitAndScore(X, Y, obj, scoreObj);
 % 
 
     % remove empty trials
@@ -27,12 +32,7 @@ function obj = fitAndScore(X, Y, obj, scoreObj)
 
     % fit hyperparameters
     if isfield(obj, 'hyperObj')
-        if obj.fitIntercept
-            Yc = Y - mean(Y,1);
-        else
-            Yc = Y;
-        end
-        obj.hyper = obj.hyperObj.fitFcn(X, Yc, obj.hyperObj.fitFcnArgs{:});
+        obj.hyper = obj.hyperObj.fitFcn(X, Y, obj, scoreObj);
     end
 
     % fit weights
