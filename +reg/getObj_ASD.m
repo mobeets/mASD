@@ -21,7 +21,7 @@ function obj = getObj_ASD(X, Y, D, scoreObj, obj)
         if strcmp(obj.llstr, 'gauss')
             obj.hyperObj = reg.getHyperObj_gauss(D);
         else
-            obj.hyperObj = reg.getHyperObj_grid(X, Y, obj);
+            obj.hyperObj = reg.getHyperObj_grid(X, Y, obj, scoreObj);
         end
     end
 end

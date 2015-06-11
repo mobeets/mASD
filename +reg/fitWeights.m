@@ -1,7 +1,7 @@
-function [mu, b] = fitWeights(X, Y, obj)
-% function [mu, b] = fitWeights(X, Y, obj)
+function [w, b] = fitWeights(X, Y, obj)
+% function [w, b] = fitWeights(X, Y, obj)
 % 
-% X, Y - return best mu,b s.t. Y ~ X*mu + b
+% X, Y - return best w,b s.t. Y ~ X*w + b
 % obj is struct
 %   - obj.isLinReg
 %   - obj.fitIntercept
@@ -14,8 +14,8 @@ function [mu, b] = fitWeights(X, Y, obj)
     if isfield(obj, 'fitFcnArgFcn')
         obj.fitFcnArgs = obj.fitFcnArgFcn(obj);
     end
-    mu = obj.fitFcn(X, Y, obj.fitFcnArgs{:});
+    w = obj.fitFcn(X, Y, obj.fitFcnArgs{:});
     predictionFcn = reg.getPredictionFcn(obj.isLinReg);
-	b = tools.setIntercept(X_mean, Y_mean, mu, obj.fitIntercept, ...
+	b = tools.setIntercept(X_mean, Y_mean, w, obj.fitIntercept, ...
         predictionFcn);
 end

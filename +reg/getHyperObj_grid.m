@@ -1,4 +1,4 @@
-function hyperObj = getHyperObj_grid(X, Y, obj)
+function hyperObj = getHyperObj_grid(X, Y, obj, scoreObj)
     hyperObj.name = 'grid';
     
     % define grid
@@ -19,4 +19,6 @@ function hyperObj = getHyperObj_grid(X, Y, obj)
     hyperObj.nfolds = nfolds;
     hyperObj.foldinds = foldinds;
     hyperObj.hypergrid = hypergrid;
+    obj.hyperObj = hyperObj;
+    hyperObj.fitFcnArgs = {obj, scoreObj};
 end

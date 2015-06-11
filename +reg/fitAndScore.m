@@ -32,16 +32,16 @@ function obj = fitAndScore(X, Y, obj, scoreObj)
 
     % fit hyperparameters
     if isfield(obj, 'hyperObj')
-        obj.hyper = obj.hyperObj.fitFcn(X, Y, obj, scoreObj);
+        obj.hyper = obj.hyperObj.fitFcn(X, Y, obj.hyperObj.fitFcnArgs{:});
     end
 
     % fit weights
-    [obj.mu, obj.b] = reg.fitWeights(X, Y, obj);
-    obj.w = [obj.mu; obj.b];
+    [obj.w, obj.b] = reg.fitWeights(X, Y, obj);
+    obj.mu = [obj.w; obj.b];
 
     % score
-    [scores, ws, scoreDev] = reg.cvFitScores(X, Y, obj, scoreObj);
-    obj.w_cv = ws;
+    [scores, mus, scoreDev] = reg.cvFitScores(X, Y, obj, scoreObj);
+    obj.mu_cv = mus;
     obj.scores = scores';
     obj.score_dev = scoreDev;
     obj.score_cvMean = mean(obj.scores);

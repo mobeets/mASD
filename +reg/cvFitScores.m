@@ -1,17 +1,17 @@
-function [scores, ws, scoreDev, w] = cvFitScores(X, Y, obj, scoreObj)
+function [scores, mus, scoreDev, mu] = cvFitScores(X, Y, obj, scoreObj)
     trials = tools.trainAndTestKFolds(X, Y, nan, obj.foldinds);
     nfolds = numel(trials);
-    ws = cell(nfolds, 1);
+    mus = cell(nfolds, 1);
     scores = nan(nfolds, 1);
     for ii = 1:nfolds
         ctrials = trials(ii);
-        [mu, b] = reg.fitWeights(ctrials.x_train, ctrials.y_train, obj);
-        ws{ii} = [mu; b];
+        [w, b] = reg.fitWeights(ctrials.x_train, ctrials.y_train, obj);
+        mus{ii} = [w; b];
         scores(ii) = scoreObj.scoreFcn(ctrials.x_test, ...
-            ctrials.y_test, ws{ii}, ctrials, scoreObj.scoreFcnArgs{:});
+            ctrials.y_test, mus{ii}, ctrials, scoreObj.scoreFcnArgs{:});
     end
-    [mu, b] = reg.fitWeights(X, Y, obj);
-    w = [mu; b];
-    scoreDev = scoreObj.scoreFcn(X, Y, w, ...
+    [w, b] = reg.fitWeights(X, Y, obj);
+    mu = [w; b];
+    scoreDev = scoreObj.scoreFcn(X, Y, mu, ...
         scoreObj.scoreFcnArgs{:});
 end
