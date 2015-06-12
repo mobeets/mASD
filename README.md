@@ -16,7 +16,37 @@ Kernel assumptions:
 
 ### Hyperparameters
 
-The ASD prior requires setting three or so hyperparameters determining the shrinkage, noise variance (Gaussian likelihood only), and smoothing (e.g., in space and/or in time). The best hyperparameters are chosen by gridding the hyperparameter search space and then picking the hyperparameter that minimizes the prediction error on test data. (Optionally, you can then repeat this process on a finer search grid of hyperparameters centered around the previous best hyperparameter.)
+The ASD prior requires setting three or so hyperparameters determining the shrinkage, noise variance (Gaussian likelihood only), and smoothing (e.g., in space and/or in time). The best hyperparameters in logistic regression are chosen by gridding the hyperparameter search space and then picking the hyperparameter that minimizes the prediction error on test data. For linear regression, we can choose the hyperparameters that maximize the log-evidence (the log-posterior with the weights marginalized out.)
+
+## Usage
+
+The fitting framework is in `+reg` and can be used to fit models with ASD, ML, and flat weights for comparison.
+
+First, you need to create a score object to specify what your goodness-of-fit test is. (The second argument passed is optional.)
+
+Linear regression:
+```
+scoreObj = reg.getScoreObj(true, 'rsq');
+```
+
+Logistic regression:
+```
+scoreObj = reg.getScoreObj(false, 'pctCorrect');
+```
+
+Now, you need to create a fitting object. Three options are shown below:
+```
+obj = reg.getObj_ASD(X, Y, D, scoreObj);
+obj = reg.getObj_ML(X, Y);
+obj = reg.getObj_Flat(X, Y);
+```
+
+ASD requires setting hyperparameters. For linear regression, ASD will use evidence optimization (assuming a gaussian likelihood), while for logistic regression it will use one level of grid search.
+
+Now, fit and score.
+```
+obj = reg.fitAndScore(X, Y, obj, scoreObj);
+```
 
 ## Testing framework
 
@@ -25,7 +55,6 @@ Running tests:
 ```
 >> runtests('tests/testLinear.m')
 >> runtests('tests/testLogistic.m')
->> runtests('tests/testBilinear.m')
 ```
 
 Updating tests:
@@ -34,5 +63,4 @@ Updating tests:
 >> cd tests
 >> updateDataLinear
 >> updateDataLogistic
->> updateDataBilinear
 ```
