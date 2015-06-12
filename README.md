@@ -9,10 +9,11 @@ ASD is a method for estimating the space-time weights/kernel in a Bayesian regre
 
 n.b. The Gaussian likelihood has a closed-form solution while the others do not.
 
-Kernel assumptions:
+### Example
 
-* full (default)
-* bilinear (space and time filters assumed separable)
+In linear regression, we assume that our measurements (Y) are the output of a linear model (Y = X*w + noise), and we want to estimate w. In the example below, the true weights (w) vary smoothly in 2d space (red = negative weights, blue = positive weights). ASD infers the amount of smoothness in X and Y using evidence optimization, allowing its estimate of w to recover the spatial regularities of the true weights. The maximum likelihood (ML) estimate, on the other hand, fails to capture this smoothness. ASD's prior assumptions decrease its sensitivity to noise, and it tends to outperform ML in cross-validation.
+
+![img](example.png)
 
 ### Hyperparameters
 
