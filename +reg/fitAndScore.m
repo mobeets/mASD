@@ -25,10 +25,10 @@ function obj = fitAndScore(X, Y, obj, scoreObj)
 % 
 
     % remove empty trials
-    inds = isnan(Y);
-    X = X(~inds,:,:);
-    Y = Y(~inds,:);
-    obj.foldinds = obj.foldinds(~inds);
+    ix = ~isnan(Y);
+    X = X(ix,:,:);
+    Y = Y(ix,:);
+    obj.foldinds = obj.foldinds(ix);
 
     % fit hyperparameters
     if isfield(obj, 'hyperObj')

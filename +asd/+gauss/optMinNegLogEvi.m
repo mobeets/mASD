@@ -1,4 +1,5 @@
-function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
+function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, ...
+    noDeltaT, nRepeats, willFitIntercept)
 % 
 % X - (p x q) matrix with inputs in rows
 % Y - (p, 1) matrix with measurements
@@ -18,6 +19,9 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
         lbs(2:end) = exp(lbs(2:end)); ubs(2:end) = exp(ubs(2:end));
     end
     
+    if nargin < 8
+        willFitIntercept = true;
+    end
     if nargin < 7
         nRepeats = 5;
     end
@@ -39,9 +43,12 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, noDeltaT, nRepeats)
     end
     [p, q] = size(X);
     
+    if willFitIntercept
+        Y = Y - mean(Y);
+    end
     YY = Y'*Y;
     XY = X'*Y;
-    XX = X'*X;
+    XX = X'*X;    
     
     if noDeltaT % full temporal smoothing
         dt = 6; theta0(end) = dt; lbs(end) = dt; ubs(end) = dt;
