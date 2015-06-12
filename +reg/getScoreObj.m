@@ -1,4 +1,11 @@
-function scoreObj = getScoreObj(name, isLinReg)
+function scoreObj = getScoreObj(isLinReg, scoreType)
+    if nargin < 2
+        if isLinReg
+            scoreType = 'rsq';
+        else
+            scoreType = 'pctCorrect';
+        end
+    end
     predictionFcn = reg.getPredictionFcn(isLinReg);
     rssFcn = @(X, Y, w,~) tools.rss(predictionFcn(X, w), Y);
     tssFcn = @(X, Y, w, ts) tools.rss(mean(ts.y_train)*ones(size(Y,1),1), Y);
@@ -8,9 +15,9 @@ function scoreObj = getScoreObj(name, isLinReg)
     pctCorrectFcn = @(X, Y, w,~) sum(correctFcn(X, Y, w)) / numel(Y);
     pctIncorrectFcn = @(X, Y, w,~) 1-pctCorrectFcn(X, Y, w);
 
-    scoreObj.name = name;
+    scoreObj.scoreType = scoreType;
     scoreObj.scoreFcnArgs = {}; % trials are passed, then these args
-    switch name
+    switch scoreType
         case 'rsq'
             scoreObj.scoreFcn = rsqFcn;
         case 'rss'

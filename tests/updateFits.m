@@ -20,9 +20,9 @@ function data = updateFits(fname, data, llstr, objML, objASD, scoreObj)
     D = asd.sqdist.spaceTime(data.Xxy, data.nt);
     if isempty(fieldnames(scoreObj))
         if strcmp(llstr, 'gauss')
-            scoreObj = reg.getScoreObj('rsq', true);
+            scoreObj = reg.getScoreObj(true, 'rsq');
         elseif strcmp(llstr, 'bern')
-            scoreObj = reg.getScoreObj('pctCorrect', false);
+            scoreObj = reg.getScoreObj(false, 'pctCorrect');
         end
     end
     objML = reg.getObj_ML(X, Y, objML);

@@ -12,7 +12,7 @@ function testLinear1(testCase)
     Y = data.Y;
     D = data.D;
 
-    scoreObj = reg.getScoreObj('rsq', true);
+    scoreObj = reg.getScoreObj(true, 'rsq');
     obj.foldinds = data.foldinds;
     obj = reg.getObj_ML(X, Y, obj);
     ML = reg.fitAndScore(X, Y, obj, scoreObj);
@@ -27,7 +27,7 @@ function testLinear2(testCase)
     Y = data.Y;
     D = data.D;
 
-    scoreObj = reg.getScoreObj('rsq', true);
+    scoreObj = reg.getScoreObj(true, 'rsq');
     obj.foldinds = data.foldinds;
     obj = reg.getObj_ASD(X, Y, D, scoreObj, obj);
     ASD = reg.fitAndScore(X, Y, obj, scoreObj);

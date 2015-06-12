@@ -14,12 +14,12 @@ function obj = fitAndScore(X, Y, obj, scoreObj)
 %     .scoreFcnArgs = {...};
 % 
 % Example (ASD linear regression):
-%     scoreObj = reg.getScoreObj('rsq', true);
+%     scoreObj = reg.getScoreObj(true, 'rsq');
 %     obj = reg.getObj_ASD(X, Y, D);
 %     obj = reg.fitAndScore(X, Y, obj, scoreObj);
 % 
 % Example (ASD logistic regression):
-%     scoreObj = reg.getScoreObj('pctCorrect', false);
+%     scoreObj = reg.getScoreObj(false, 'pctCorrect');
 %     obj = reg.getObj_ASD(X, Y, D, scoreObj);
 %     obj = reg.fitAndScore(X, Y, obj, scoreObj);
 % 
