@@ -17,7 +17,7 @@ In linear regression, we assume that our measurements (Y) are the output of a li
 
 ### Hyperparameters
 
-The ASD prior requires setting three or so hyperparameters determining the shrinkage, noise variance (Gaussian likelihood only), and smoothing (e.g., in space and/or in time). The best hyperparameters in logistic regression are chosen by gridding the hyperparameter search space and then picking the hyperparameter that minimizes the prediction error on test data. For linear regression, we can choose the hyperparameters that maximize the log-evidence (the log-posterior with the weights marginalized out.)
+The ASD prior requires setting three or so hyperparameters determining the shrinkage, noise variance (Gaussian likelihood only), and smoothing (e.g., in space and/or in time). The best hyperparameters in logistic regression are chosen by gridding the hyperparameter search space and then picking the hyperparameter that minimizes the prediction error on test data. For linear regression, we can use evidence optimization to choose the hyperparameters that maximize the log-evidence (the log-posterior with the weights marginalized out).
 
 ## Usage
 
@@ -35,19 +35,26 @@ Logistic regression:
 scoreObj = reg.getScoreObj(false, 'pctCorrect');
 ```
 
-Now, you need to create a fitting object. Three options are shown below:
+Next you need to create a fitting object. The three defaults are shown below:
 ```
 obj = reg.getObj_ASD(X, Y, D, scoreObj);
 obj = reg.getObj_ML(X, Y);
 obj = reg.getObj_Flat(X, Y);
 ```
 
-ASD requires setting hyperparameters. For linear regression, ASD will use evidence optimization (assuming a gaussian likelihood), while for logistic regression it will use one level of grid search.
-
 Now, fit and score.
 ```
 obj = reg.fitAndScore(X, Y, obj, scoreObj);
 ```
+
+Unlike the ML and Flat models, ASD selects hyperparameters. For linear regression, ASD uses evidence optimization (assuming a gaussian likelihood), while logistic regression uses one level of grid search. ASD's fitted hyperparameters are in `obj.hyper`.
+
+The model's weight estimate is `obj.mu`, which includes the intercept term. You can calculate the model's response to `X` as follows:
+```
+f = reg.getPredictionFcn(obj.isLinReg);
+Yh = f(X, obj.mu);
+```
+
 
 ## Testing framework
 
