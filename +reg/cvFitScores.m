@@ -12,6 +12,6 @@ function [scores, mus, scoreDev, mu] = cvFitScores(X, Y, obj, scoreObj)
     end
     [w, b] = reg.fitWeights(X, Y, obj);
     mu = [w; b];
-    scoreDev = scoreObj.scoreFcn(X, Y, mu, ...
+    scoreDev = scoreObj.scoreFcn(X, Y, mu, struct('y_train', Y), ...
         scoreObj.scoreFcnArgs{:});
 end
