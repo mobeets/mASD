@@ -3,7 +3,7 @@
 % 2. Uncomment the rng line below to set seed
 % 3. Uncomment the plot lines
 
-% rng(101);
+rng(101);
 
 %% truth
 
@@ -35,16 +35,16 @@ ML = reg.fitAndScore(X, Y, ML, scoreObj);
 
 %%
 
-% figure(1); clf; axis off; title('truth');
-% plot.plotKernelSingle(Xxy, w, nan, 130);
-% figure(2); clf; axis off; title('ASD');
-% plot.plotKernelSingle(Xxy, ASD.w, nan, 130);
-% figure(3); clf; axis off; title('ML');
-% plot.plotKernelSingle(Xxy, ML.w, nan, 130);
-% figure(4); clf; hold on;
-% f = reg.getPredictionFcn(isLinReg);
-% scatter(Y, Y-f(X,ASD.mu), 'b');
-% scatter(Y, Y-f(X,ML.mu), 'g');
+figure(1); clf; axis off; title('truth');
+plot.plotKernelSingle(Xxy, w, nan, 130);
+figure(2); clf; axis off; title('ASD');
+plot.plotKernelSingle(Xxy, ASD.w, nan, 130);
+figure(3); clf; axis off; title('ML');
+plot.plotKernelSingle(Xxy, ML.w, nan, 130);
+figure(4); clf; hold on;
+f = reg.getPredictionFcn(isLinReg);
+scatter(Y, Y-f(X,ASD.mu), 'b');
+scatter(Y, Y-f(X,ML.mu), 'g');
 
 disp(' ');
 disp('avg r-sq scores across 5-fold c-v');

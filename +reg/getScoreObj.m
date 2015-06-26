@@ -3,7 +3,7 @@ function scoreObj = getScoreObj(isLinReg, scoreType)
         if isLinReg
             scoreType = 'rsq';
         else
-            scoreType = 'pctCorrect';
+            scoreType = 'mcc';
         end
     end
     predictionFcn = reg.getPredictionFcn(isLinReg);
@@ -13,6 +13,7 @@ function scoreObj = getScoreObj(isLinReg, scoreType)
     correctFcn = @(X, Y, w,~) round(predictionFcn(X, w)) == Y;
     pctCorrectFcn = @(X, Y, w,~) sum(correctFcn(X, Y, w)) / numel(Y);
     pctIncorrectFcn = @(X, Y, w,~) 1-pctCorrectFcn(X, Y, w);
+    mccFcn = @(X, Y, w,~) tools.mcc(Y, round(predictionFcn(X, w)));
     
     constPrediction = @(Y0, Y) Y0*ones(size(Y,1),1);
     if isLinReg % 'rss' using mean of training set
@@ -34,5 +35,10 @@ function scoreObj = getScoreObj(isLinReg, scoreType)
             scoreObj.scoreFcn = pctCorrectFcn;
         case 'pctIncorrect'
             scoreObj.scoreFcn = pctIncorrectFcn;
+        case 'mcc'
+            % matthew's correlation coefficient; more balanced than pctCor
+            scoreObj.scoreFcn = mccFcn;
+        case 'nmcc'
+            scoreObj.scoreFcn = @(X, Y, w,ts) -1*mccFcn(X,Y,w,ts);
     end    
 end
