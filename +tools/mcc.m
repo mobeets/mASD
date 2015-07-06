@@ -4,6 +4,7 @@ function v = mcc(Ytrue, Ypred)
 % calculates matthew's correlation coefficient
 % returns a value between -1 and 1
 % 
+    assert(~isempty(Ytrue) && ~isempty(Ypred));
     C0 = min([min(Ytrue), min(Ypred)]);
     C1 = max([max(Ytrue), max(Ypred)]);
     
