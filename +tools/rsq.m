@@ -1,9 +1,9 @@
-function v = rsq(A, B)
-    assert(isequal(size(A), size(B)));
-    if size(A,1) == 1
-        A = A'; B = B';
+function v = rsq(Yh, Y)
+    assert(isequal(size(Yh), size(Y)));
+    if size(Yh,1) == 1
+        Yh = Yh'; Y = Y';
     end
-    top = A - B;
-    bot = B - mean(B);
+    top = Yh - Y;
+    bot = Y - mean(Y);
     v = 1 - (top'*top)/(bot'*bot);
 end
