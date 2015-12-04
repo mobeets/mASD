@@ -12,7 +12,7 @@ function [trials, inds] = trainAndTestKFolds(X, Y, nfolds, inds)
 % 
     if nargin < 4 || all(isnan(inds))
         ny = numel(Y);
-        inds = crossvalind('Kfold', ny, nfolds);
+        inds = tools.crossvalind('Kfold', ny, nfolds);
     else
         nfolds = max(inds);
     end
