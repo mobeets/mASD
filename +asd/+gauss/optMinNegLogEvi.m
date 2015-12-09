@@ -32,7 +32,7 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, ...
         gradObj = false;
     end
     if nargin < 4 || any(isnan(theta0))
-        theta0 = [1e-6 Y'*Y/numel(Y) ones(size(Ds,3),1)]';
+        theta0 = [1e-6 Y'*Y/numel(Y) ones(1,size(Ds,3))]';
 %         theta0 = pickRandomTheta0(lbs, ubs, isLog);
 %         theta0 = [1.1529  160.2757    1.0093    1.0048];
 %         theta0(2:end) = log(theta0(2:end))
