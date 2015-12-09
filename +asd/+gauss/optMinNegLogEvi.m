@@ -23,7 +23,7 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, ...
         willFitIntercept = true;
     end
     if nargin < 7
-        nRepeats = 5;
+        nRepeats = 10;
     end
     if nargin < 6 || isnan(noDeltaT)
         noDeltaT = false;
@@ -32,7 +32,8 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, ...
         gradObj = false;
     end
     if nargin < 4 || any(isnan(theta0))
-        theta0 = pickRandomTheta0(lbs, ubs, isLog);
+        theta0 = [1e-6 Y'*Y/numel(Y) ones(size(Ds,3),1)]';
+%         theta0 = pickRandomTheta0(lbs, ubs, isLog);
 %         theta0 = [1.1529  160.2757    1.0093    1.0048];
 %         theta0(2:end) = log(theta0(2:end))
     end
@@ -60,7 +61,8 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, ...
         'AlwaysHonorConstraints', 'none'); % interior-point, 'Active-Set'
 %     'DerivativeCheck', 'on', ...
 
-    obj = @(hyper) objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog);
+    obj = @(hyper) asd.gauss.objfcn(hyper, ...
+        Ds, X, Y, XX, XY, YY, p, q, isLog);
     [hyper, fval] = fmincon(obj, theta0, ...
         [], [], [], [], lbs, ubs, [], opts);
     
@@ -86,37 +88,6 @@ function hyper = optMinNegLogEvi(X, Y, Ds, theta0, gradObj, ...
         hyper(2:end) = exp(hyper(2:end));
     end
     hyper = hyper';
-end
-
-function [nlogevi, nderlogevi] = objfcn(hyper, Ds, X, Y, XX, XY, YY, p, q, isLog)
-    if isLog
-        hyper(2:end) = exp(hyper(2:end));
-    end
-
-    [ro, ssq, deltas] = asd.unpackHyper(hyper);
-    Reg = asd.prior(ro, Ds, deltas);
-    [logEvi, sigmaInv, B, isNewBasis] = asd.gauss.logEvidence(X, Y, XX, ...
-        YY, XY, Reg, ssq, p, q);
-    nlogevi = -logEvi;
-    if nargout > 1
-        if isNewBasis
-            XY = (X*B)'*Y;
-        end
-        mu = tools.postMean(sigmaInv, XY, ssq);
-        if isNewBasis
-            mu = B*mu;
-            sigmaInv = B*sigmaInv*B';
-        end
-        sse = tools.sse(Y, X, mu);
-        Sigma = sigmaInv \ eye(q);
-        [der_ro, der_ssq, der_deltas] = asd.gauss.logEvidenceGradient(...
-            hyper, p, q, Ds, mu, Sigma, Reg, sse);
-        derlogevi = [der_ro, der_ssq, der_deltas];
-        nderlogevi = -derlogevi;
-        if isLog
-            nderlogevi(2:end) = -log(derlogevi(2:end));
-        end
-    end
 end
 
 function theta0 = pickRandomTheta0(lbs, ubs, isLog)
