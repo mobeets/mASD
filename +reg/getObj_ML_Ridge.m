@@ -6,7 +6,10 @@ function obj = getObj_ML_Ridge(X, Y, scoreObj, obj)
         obj = struct();
     end
     obj = reg.getObj(X, Y, obj);
-    obj.fitType = 'ML';
+    obj.fitType = 'Ridge';
+    if ~isfield(obj, 'wML')
+        obj.wML = nan;
+    end
 
     if strcmp(obj.llstr, 'gauss')
         obj.fitFcn = @ml.calcGaussML_Ridge;
@@ -15,7 +18,6 @@ function obj = getObj_ML_Ridge(X, Y, scoreObj, obj)
     
     if ~isfield(obj, 'hyperObj')
         if strcmp(obj.llstr, 'gauss')
-%             obj.hyperObj = reg.getRidgeHyperObj_grid(X, Y, obj, scoreObj);
             obj.hyperObj = reg.getHyperObj_gaussRidge(obj.wML);
         else
             obj.hyperObj = reg.getRidgeHyperObj_grid(X, Y, obj, scoreObj);
