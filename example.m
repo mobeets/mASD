@@ -16,37 +16,56 @@ w = mvnrnd(zeros(nw,1), asd.prior(2, D, 1))';
 
 X = rand(nt,nw)-1;
 e = randn(nt,1);
-Y = X*w + 3*e;
-isLinReg = true;
+Y = X*w + 2*e;
+isLinReg = false;
 
-%% ASD
+if ~isLinReg
+%     Y = double(Y - prctile(Y, 40) > 0);
+    Y = double(tools.logistic(Y) >= 0.5);
+%     scoreType = 'mcc';
+    scoreType = 'pctCorrect';
+else
+    scoreType = 'rsq';
+end
 
-clear obj
-scoreObj = reg.getScoreObj(isLinReg, 'rsq');
-ASD = reg.getObj_ASD(X, Y, D);
+%% fit and score
+
+% ASD
+scoreObj = reg.getScoreObj(isLinReg, scoreType);
+ASD = reg.getObj_ASD(X, Y, D, scoreObj);
 ASD = reg.fitAndScore(X, Y, ASD, scoreObj);
 
-%% ML
-
-clear obj
-scoreObj = reg.getScoreObj(isLinReg, 'rsq');
+% ML
+scoreObj = reg.getScoreObj(isLinReg, scoreType);
 ML = reg.getObj_ML(X, Y);
 ML = reg.fitAndScore(X, Y, ML, scoreObj);
 
-%%
+%% plot results
 
-figure(1); clf; axis off; title('truth');
-plot.plotKernelSingle(Xxy, w, nan, 130);
-figure(2); clf; axis off; title('ASD');
-plot.plotKernelSingle(Xxy, ASD.w, nan, 130);
-figure(3); clf; axis off; title('ML');
-plot.plotKernelSingle(Xxy, ML.w, nan, 130);
-figure(4); clf; hold on;
-f = reg.getPredictionFcn(isLinReg);
-scatter(Y, Y-f(X,ASD.mu), 'b');
-scatter(Y, Y-f(X,ML.mu), 'g');
+cmn = floor(min([w; ASD.w; ML.w]));
+sz = 100;
+figure; set(gcf, 'color', 'w');
+subplot(2,2,1); hold on;
+plot.rfSingle(Xxy, w, cmn, sz); axis off; title('true');
+subplot(2,2,2); hold on;
+plot.rfSingle(Xxy, ASD.w, cmn, sz); axis off; title('ASD');
+subplot(2,2,3); hold on;
+plot.rfSingle(Xxy, ML.w, cmn, sz); axis off; title('ML');
+subplot(2,2,4); hold on;
+bar(1:2, [ASD.score ML.score], 'FaceColor', 'w');
+set(gca, 'XTick', 1:2, 'XTickLabel', {'ASD', 'ML'});
+ylim([0 1]);
+ylabel(['score (' scoreType ')']);
 
-disp(' ');
-disp('avg r-sq scores across 5-fold c-v');
-disp('---------------------------------');
-disp(['ASD = ' num2str(ASD.score) ', ML = ' num2str(ML.score)]);
+% f = reg.getPredictionFcn(isLinReg);
+% YhASD = f(X, ASD.mu); YhML = f(X, ML.mu);
+% if isLinReg
+%     scatter(Y, Y-YhASD, 'b.');
+%     scatter(Y, Y-YhML, 'g.');
+%     xlabel('true Y'); ylabel('errors');
+% end
+
+% disp(' ');
+% disp('avg r-sq scores across 5-fold c-v');
+% disp('---------------------------------');
+% disp(['ASD = ' num2str(ASD.score) ', ML = ' num2str(ML.score)]);
